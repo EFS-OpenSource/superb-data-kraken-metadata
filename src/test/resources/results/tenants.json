@@ -1,0 +1,20 @@
+{
+  "testorganization": {
+    "reserved": false,
+    "hidden": false,
+    "description": "test tenant",
+    "static": false
+  },
+  "global_tenant": {
+    "reserved": true,
+    "hidden": false,
+    "description": "Global tenant",
+    "static": true
+  },
+  "admin_tenant": {
+    "reserved": false,
+    "hidden": false,
+    "description": "Demo tenant for admin user",
+    "static": false
+  }
+}

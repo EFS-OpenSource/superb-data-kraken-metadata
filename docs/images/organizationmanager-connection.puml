@@ -1,0 +1,10 @@
+@startuml
+actor Client
+Client -> Organizationmanager: Create/Update/Delete Organization / Space
+Organizationmanager --> Organizationmanager: ...
+Organizationmanager-> MetadataService: Create/Update/Delete Organization / Space
+MetadataService --> MetadataService: manage context
+MetadataService -> Organizationmanager: Response
+Organizationmanager --> Organizationmanager: handleResponse()
+Organizationmanager -> Client: Response
+@enduml

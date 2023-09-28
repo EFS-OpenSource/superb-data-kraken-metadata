@@ -1,0 +1,26 @@
+{
+  "cluster_permissions": [
+    "indices:data/read/scroll/clear"
+  ],
+  "tenant_permissions": [
+    {
+      "tenant_patterns": ["<tenant_pattern>"],
+      "allowed_actions": ["<tenant_allowed_action>"]
+    }
+  ],
+  "index_permissions": [
+    {
+      "index_patterns": ["<index_pattern>"],
+      "allowed_actions": <index_allowed_actions>
+    },
+    {
+      "index_patterns": [
+        "modelindex"
+      ],
+      "dls": "{\"query_string\": {\"query\": \"index_name: <index_pattern>\",\"analyze_wildcard\":true}}",
+      "fls": [],
+      "masked_fields": [],
+      "allowed_actions": ["<modelindex_allowed_action>"]
+    }
+  ]
+}

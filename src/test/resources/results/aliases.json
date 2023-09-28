@@ -1,0 +1,26 @@
+{
+  ".opendistro_security" : {
+    "aliases" : { }
+  },
+  ".kibana_92668751_admin_1" : {
+    "aliases" : {
+      ".kibana_92668751_admin" : { }
+    }
+  },
+  "my-index-000001" : {
+    "aliases" : { }
+  },
+  "security-auditlog-2021.11.10" : {
+    "aliases" : { }
+  },
+  "test_test_measurements" : {
+    "aliases" : {
+      "measurements" : { }
+    }
+  },
+  ".kibana_1" : {
+    "aliases" : {
+      ".kibana" : { }
+    }
+  }
+}

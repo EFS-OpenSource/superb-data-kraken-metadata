@@ -1,0 +1,9 @@
+.git/
+.mvn/
+src
+target/
+docs/
+kubernetes/
+!.dockerignore
+!Dockerfile
+!target/*.jar

@@ -1,0 +1,35 @@
+{
+  "test_test_user" : {
+    "hosts" : [ ],
+    "users" : [ ],
+    "reserved" : false,
+    "hidden" : false,
+    "backend_roles" : [ ],
+    "and_backend_roles" : [
+      "spc_test_user",
+      "org_test_access"
+    ]
+  },
+  "test_test_trustee" : {
+    "hosts" : [ ],
+    "users" : [ ],
+    "reserved" : false,
+    "hidden" : false,
+    "backend_roles" : [ ],
+    "and_backend_roles" : [
+      "spc_test_trustee",
+      "org_test_access"
+    ]
+  },
+  "test_test_supplier" : {
+    "hosts" : [ ],
+    "users" : [ ],
+    "reserved" : false,
+    "hidden" : false,
+    "backend_roles" : [ ],
+    "and_backend_roles" : [
+      "spc_test_supplier",
+      "org_test_access"
+    ]
+  }
+}

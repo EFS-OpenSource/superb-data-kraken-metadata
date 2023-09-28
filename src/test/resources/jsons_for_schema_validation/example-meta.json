@@ -1,0 +1,109 @@
+{
+  "name": "Spurwechsel",
+  "description": "Doppelter Suprwechsel unter Zug",
+  "dateTime": {
+    "createdAt": "2021-09-07T13:55:17+0200",
+    "startedAt": "2021-09-07T13:55:17+0200",
+    "endedAt": "2021-09-07T13:55:17+0200",
+    "retentionTime": "5"
+  },
+  "customers": [{
+    "name": "Audi",
+    "department": "EF-26",
+    "contactPersons": [
+      {
+        "name": "Max Mustermann",
+        "telephone": "65464-654654-654",
+        "email": "some.some@some.com"
+      }
+    ],
+    "address": {
+      "houseNumber": "1",
+      "street": "PVG Street",
+      "city": "Santa Oliva",
+      "postalCode": "654655",
+      "country": "Spain"
+    }
+  }],
+  "project": {
+    "name": "ESC Entwicklung D5",
+    "type": "internal",
+    "costCenters": ["232340234 234 2034"],
+    "confidentiality": "secret",
+    "purpose": "Serienentwicklung und Freigabe vom ESC Stabilitätsregler auf der MLBevo D Plattform"
+  },
+  "scope": {
+    "name": "Entwicklung SW Baseline 1",
+    "purpose": "Entwicklung von Funktionen für Hochreibwert und interne Freigabe",
+    "confidentiality": "secret",
+    "releaseLevel": "CAT3",
+    "tags": ["Hochreibert", "Entwicklungs-SW", "80% Funktion"]
+  },
+  "environment": {
+    "name": "Idiada Proving Ground",
+    "longitude": ["41.267588"],
+    "latitude": ["1.521172"],
+    "contactPersons": [
+      {
+        "name": "Max Mustermann",
+        "telephone": "65464-654654-654",
+        "email": "some.some@some.com"
+      }
+    ],
+    "address": {
+      "houseNumber": "1",
+      "street": "PVG Street",
+      "city": "Santa Oliva",
+      "postalCode": "654655",
+      "country": "Spain"
+    }
+  },
+  "authors": [
+    {
+      "name": "Max Mustermann",
+      "telephone": "65464-654654-654",
+      "email": "some.some@some.com"
+    }
+  ],
+  "data": [
+    {
+      "name": "1222381203.zip",
+      "format": "zip",
+      "dateTime": {
+        "createdAt": "2021-09-07T13:55:17+0200",
+        "startedAt": "2021-09-07T13:55:17+0200",
+        "endedAt": "2021-09-07T13:55:17+0200",
+        "retentionTime": "5"
+      },
+      "relatedToEntities": ["HN-IZ6180"]
+    },
+    {
+      "name": "1252381203.zip",
+      "format": "zip",
+      "dateTime": {
+        "createdAt": "2021-09-07T13:55:17+0200",
+        "startedAt": "2021-09-07T13:55:17+0200",
+        "endedAt": "2021-09-07T13:55:17+0200",
+        "retentionTime": "5"
+      },
+      "relatedToEntities": ["HN-IZ6180"]
+    }
+  ],
+  "entities": [
+    {
+      "name": "HN-IZ6180",
+      "specification": "W12-430kW",
+      "licensing": {
+        "form": "",
+        "definition": "",
+        "identifier": ""
+      },
+      "type": "unit under test"
+    }
+  ],
+  "tags": ["SPW", "gerissen", "angetrieben", "trocken", "100"],
+  "result": {
+    "passed": true,
+    "comment": " Fzg. stabil"
+  }
+}

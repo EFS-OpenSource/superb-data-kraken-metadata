@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "project" : {
+      "projectId" : "test 722",
+      "projectType" : "external",
+      "projectConfidentiality" : "asdf"
+    },
+    "customer" : {
+      "customerId" : "efs",
+      "customerInfo" : "demo update"
+    },
+    "caseList" : [],
+    "entityList" : [],
+    "dataList" : []
+  },
+  "organization": "test",
+  "space": "test",
+  "rootdir": "123",
+  "massdata": [
+    {
+      "location": "123/test.bin",
+      "name": "test.bin",
+      "dateCreated": "2023-04-05T15:16:22+0000",
+      "size": 120
+    }
+  ]
+}

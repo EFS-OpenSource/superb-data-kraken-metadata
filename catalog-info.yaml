@@ -1,0 +1,63 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: sdk-metadata-metadata-service
+  description: Metadata Service of the Superb Data Kraken
+  annotations:
+    dev.azure.com/project-repo: EFS-SDK/metadata
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - java
+    - spring-boot
+    - sdk
+    - sdk-metadata
+  links:
+    - url: https://sdk.efs.ai/metadata/swagger-ui/index.html
+      title: e:fs SDK (prod) Swagger UI
+    - url: https://sdk-dev.efs.ai/metadata/swagger-ui/index.html
+      title: e:fs SDK (dev) Swagger UI
+    - url: https://aicloud.efs.ai/metadata/swagger-ui/index.html
+      title: AICloud (prod) Swagger UI
+spec:
+  type: service
+  lifecycle: production
+  owner: team-sdk
+  system: sdk
+  subcomponentOf: sdk-metadata
+  dependsOn:
+    - component:sdk-metadata-organizationmanager-service
+    - component:sdk-metadata-opensearch-service
+    - component:sdk-operations-keycloak-service
+    - component:sdk-operations-kafka-service
+    - component:sdk-commons
+  providesApis:
+    - sdk-metadata-metadata-api
+  consumesApis:
+    - sdk-metadata-organizationmanager-api
+    - sdk-metadata-opensearch-api
+    - sdk-operations-keycloak-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: sdk-metadata-metadata-api
+  description: Metadata Service API of the Superb Data Kraken
+  annotations:
+    dev.azure.com/project-repo: EFS-SDK/metadata
+  tags:
+    - sdk
+    - sdk-metadata
+  links:
+    - url: https://sdk.efs.ai/metadata/swagger-ui/index.html
+      title: e:fs SDK (prod) Swagger UI
+    - url: https://sdk-dev.efs.ai/metadata/swagger-ui/index.html
+      title: e:fs SDK (dev) Swagger UI
+    - url: https://aicloud.efs.ai/metadata/swagger-ui/index.html
+      title: AICloud (prod) Swagger UI
+spec:
+  type: openapi
+  lifecycle: production
+  owner: team-sdk
+  system: sdk
+  definition:
+    $text: https://sdk.efs.ai/metadata/v3/api-docs

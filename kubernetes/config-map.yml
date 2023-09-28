@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metadata
+  namespace: backend
+data:
+  application.yml: |-
+    apidoc:
+      title: EFS SDK Metadata-API
+    sdk:
+      oauth2:
+        client-id: $(environment)-client
+        authorization-grant-type: authorization_code
+        scope: openid
+        user-name-attribute: preferred_username
+        config-url: http://keycloak$(postfix)-http.operations.svc.cluster.local/auth/realms/efs-$(environment)/.well-known/openid-configuration
+    server:
+      port: 8090
+      servlet:
+        context-path: /metadata
+      error:
+        include-message: always
+    spring:
+      kafka:
+        admin:
+          fail-fast: true
+        bootstrap-servers: $(environment)-eventhub$(postfix).servicebus.windows.net:9093
+        properties:
+          sasl:
+            mechanism: PLAIN
+          security:
+            protocol: SASL_SSL
+          group:
+            id: $Default
+    metadata:
+      topics:
+        indexing-done-topic: indexing-done
+      opensearch:
+        url: https://$(elasticsearch-service).elasticsearch.svc.cluster.local:9200
+        security-endpoint: $(elasticsearch_security_endpoint)
+      auth:
+        client-id: $(environment)-client-confidential
+      organizationmanager-endpoints:
+        organization: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/organization
+        space: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/space
+      schemamanager-endpoints:
+        modelindex: http://schemamanager-service$(postfix).backend.svc.cluster.local:8090/schemamanager/v1.0/modelindex
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: [
+                prometheus,
+                health,
+                info
+            ]
+      health:
+        opensearch:
+          enabled: false

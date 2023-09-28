@@ -1,0 +1,11 @@
+site_name: Metadata Service
+repo_url: https://dev.azure.com/EFSCIS/EFS-SDK/_git/metadata
+site_description: Documentation for the Metadata service of the Superb Data Kraken
+
+nav:
+  - Home: index.md
+  - Architecture Decision Records (ADR):
+    - Template: arch/0000_template-adr.md
+
+plugins:
+  - techdocs-core

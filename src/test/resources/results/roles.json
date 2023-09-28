@@ -1,0 +1,59 @@
+{
+  "test_test_user" : {
+    "reserved" : false,
+    "hidden" : false,
+    "cluster_permissions" : [ ],
+    "index_permissions" : [
+      {
+        "index_patterns" : [
+          "test_test_*"
+        ],
+        "fls" : [ ],
+        "masked_fields" : [ ],
+        "allowed_actions" : [
+          "read"
+        ]
+      }
+    ],
+    "tenant_permissions" : [ ],
+    "static" : false
+  },
+  "test_test_trustee" : {
+    "reserved" : false,
+    "hidden" : false,
+    "cluster_permissions" : [ ],
+    "index_permissions" : [
+      {
+        "index_patterns" : [
+          "test_test_*"
+        ],
+        "fls" : [ ],
+        "masked_fields" : [ ],
+        "allowed_actions" : [
+          "crud"
+        ]
+      }
+    ],
+    "tenant_permissions" : [ ],
+    "static" : false
+  },
+  "test_test_supplier" : {
+    "reserved" : false,
+    "hidden" : false,
+    "cluster_permissions" : [ ],
+    "index_permissions" : [
+      {
+        "index_patterns" : [
+          "test_test_*"
+        ],
+        "fls" : [ ],
+        "masked_fields" : [ ],
+        "allowed_actions" : [
+          "search"
+        ]
+      }
+    ],
+    "tenant_permissions" : [ ],
+    "static" : false
+  }
+}

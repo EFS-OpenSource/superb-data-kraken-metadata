@@ -1,0 +1,26 @@
+{
+  "cluster_permissions": [
+    "indices:data/read/scroll/clear"
+  ],
+  "tenant_permissions": [
+    {
+      "tenant_patterns": ["organization_space"],
+      "allowed_actions": ["kibana_all_read"]
+    }
+  ],
+  "index_permissions": [
+    {
+      "index_patterns": ["organization_space_*"],
+      "allowed_actions": ["read","indices:data/read/scroll","indices:admin/mappings/get"]
+    },
+    {
+      "index_patterns": [
+        "modelindex"
+      ],
+      "dls": "{\"query_string\": {\"query\": \"index_name: organization_space_*\",\"analyze_wildcard\":true}}",
+      "fls": [],
+      "masked_fields": [],
+      "allowed_actions": ["read"]
+    }
+  ]
+}

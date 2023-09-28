@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metadata
+  namespace: backend
+  labels:
+    app: metadata
+    tier: backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: metadata
+      labels:
+        app: metadata
+        tier: backend
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8090"
+        prometheus.io/path: "/metadata/actuator/prometheus"
+    spec:
+      serviceAccountName: metadata-account
+      containers:
+        - name: metadata
+          image: acr$(environment).azurecr.io/metadata:$(tagVersion)
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: metadata-user
+              mountPath: "/etc/metadata-secret"
+              readOnly: true
+            - name: eventhub-secret
+              mountPath: "/etc/eventhub-secret"
+              readOnly: true
+            - name: meta-json-schema
+              mountPath: "/etc/meta-json-schema"
+              readOnly: true
+            - name: app-configuration
+              mountPath: "/etc/application"
+              readOnly: true
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 200m
+            limits:
+              memory: 768Mi
+              cpu: 300m
+          ports:
+            - containerPort: 8090
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /metadata/actuator/health
+              port: 8090
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 1
+            successThreshold: 1
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                - key: agentpool
+                  operator: In
+                  values:
+                  - userpool
+      volumes:
+        - name: metadata-user
+          secret:
+            secretName: metadata-user
+        - name: eventhub-secret
+          secret:
+            secretName: eventhub-secret
+        - name: meta-json-schema
+          secret:
+            secretName: meta-json-schema
+        - name: app-configuration
+          configMap:
+            name: metadata
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: metadata
+      tier: backend

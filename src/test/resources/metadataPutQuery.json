@@ -1,0 +1,14 @@
+{
+  "project": {
+    "projectId": "test 722",
+    "projectType": "external",
+    "projectConfidentiality": "asdf"
+  },
+  "customer": {
+    "customerId": "efs",
+    "customerInfo": "demo update"
+  },
+  "caseList": [],
+  "entityList": [],
+  "dataList": []
+}

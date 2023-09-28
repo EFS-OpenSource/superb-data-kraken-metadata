@@ -1,0 +1,6 @@
+{
+  "and_backend_roles": [
+    "org_all_public",
+    "spc_all_public"
+  ]
+}

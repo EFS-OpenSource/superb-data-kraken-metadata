@@ -1,0 +1,12 @@
+{
+  "tenant_permissions": [
+    {
+      "tenant_patterns": [
+        "organization"
+      ],
+      "allowed_actions": [
+        "read"
+      ]
+    }
+  ]
+}
