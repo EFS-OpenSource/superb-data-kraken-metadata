@@ -2,20 +2,18 @@ spring:
   config:
     import: "kubernetes:"
   application:
-    name: metadata-backend
+    name: organizationmanager
   cloud:
     kubernetes:
       secrets:
         enabled: true
         paths:
-          - /etc/metadata-secret
-          - /etc/eventhub-secret
-          - /etc/meta-json-schema
+          - /etc/secrets
+          - /etc/db-secret
+          - /etc/orgamanager-secret
       config:
         paths:
           - /etc/application/application.yml
-          - /etc/application/applicationinsights.json
         enable-api: false
       reload:
-        enabled:
-          false
+        enabled: false

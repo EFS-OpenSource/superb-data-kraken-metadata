@@ -4,9 +4,30 @@ metadata:
   name: metadata
   namespace: backend
 data:
+  applicationinsights.json: |-
+    {
+      "connectionString": "$(app-insights-con-string)",
+      "role": {
+        "name": "Metadata Service"
+      },
+      "instrumentation": {
+        "logging": {
+          "level": "OFF"
+        },
+        "micrometer": {
+          "enabled": true
+        }
+      },
+      "heartbeat": {
+        "intervalSeconds": 60
+      }
+    }
   application.yml: |-
     apidoc:
       title: EFS SDK Metadata-API
+    azure:
+      application-insights:
+        instrumentation-key: $(app-insights-instrumentation-key)
     sdk:
       oauth2:
         client-id: $(environment)-client
@@ -57,3 +78,7 @@ data:
       health:
         opensearch:
           enabled: false
+    logging:
+      config: classpath:com/efs/sdk/logging/sdk.logback.xml
+      level:
+        com.efs.sdk: $(logging-level)
