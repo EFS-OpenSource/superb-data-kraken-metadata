@@ -88,6 +88,10 @@ stages:
                 echo "dockerRegistryServiceConnection is $(dockerRegistryServiceConnection)"
                 echo "imageRepository is $(imageRepository)"
                 echo "dockerfilePath is $(dockerfilePath)"
+          - task: CmdLine@2
+            displayName: Download Application Insights
+            inputs:
+              script: 'curl -L -o applicationinsights-agent.jar https://github.com/microsoft/ApplicationInsights-Java/releases/download/3.4.14/applicationinsights-agent-3.4.14.jar'
           - task: Docker@2
             displayName: Build and push an image to container registry
             inputs:

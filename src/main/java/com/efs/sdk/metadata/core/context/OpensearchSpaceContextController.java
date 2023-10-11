@@ -16,6 +16,7 @@ limitations under the License.
 package com.efs.sdk.metadata.core.context;
 
 import com.efs.sdk.common.domain.dto.SpaceContextDTO;
+import com.efs.sdk.logging.AuditLogger;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.AuthService;
 import com.efs.sdk.metadata.helper.AuthHelper;
@@ -55,53 +56,68 @@ public class OpensearchSpaceContextController {
         this.authService = authService;
     }
 
-    //TODO: adjust roles according to roles-/rights-concept!!
-    @Operation(summary = "Create OpenSearch context for the specified Space", description = "Creates the OpenSearch-context for the specified `Space`, consisting of tenant, roles, rolesmappings and measurement-index")
+    @Operation(summary = "Create OpenSearch context for the specified Space", description = "Creates the OpenSearch-context for the specified `Space`, " +
+            "consisting of tenant, roles, rolesmappings and measurement-index")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponse(responseCode = "200", description = "Successfully created OpenSearch-context")
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to create OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to create one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> createSpaceResources(@Parameter(hidden = true) JwtAuthenticationToken token, @PathVariable String organizationName, @Valid @RequestBody SpaceContextDTO space) throws MetadataException {
+    public ResponseEntity<Void> createSpaceResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @PathVariable String organizationName,
+            @Valid @RequestBody SpaceContextDTO dto
+    ) throws MetadataException {
+        AuditLogger.info(LOG, "Creating OpenSearch context for space {} in organization {}", token, dto.getName(), dto.getOrganization().getName());
         if (!authHelper.isSuperuser(token)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
         String accessToken = authService.getSAAccessToken();
-        osCtxService.createSpaceContext(space, accessToken);
+        osCtxService.createSpaceContext(dto, accessToken);
 
-        LOG.debug("OpenSearch Space Context for {} created", space.getName());
+        LOG.debug("OpenSearch Space Context for {} created", dto.getName());
         return ResponseEntity.ok().build();
     }
 
-    //TODO: adjust roles according to roles-/rights-concept!!
-    @Operation(summary = "Updates OpenSearch context", description = "Updates the OpenSearch-context for the specified `Space`, consisting of tenant, roles and rolesmappings")
+    @Operation(summary = "Updates OpenSearch context", description = "Updates the OpenSearch-context for the specified `Space`, consisting of tenant, roles " +
+            "and rolesmappings")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, path = "{spaceName}")
     @ApiResponse(responseCode = "200", description = "Successfully updated OpenSearch-context")
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to update OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to update one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> updateSpaceResources(@Parameter(hidden = true) JwtAuthenticationToken token, @PathVariable String organizationName, @PathVariable String spaceName, @Valid @RequestBody SpaceContextDTO space) throws MetadataException {
+    public ResponseEntity<Void> updateSpaceResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @PathVariable String organizationName,
+            @PathVariable String spaceName,
+            @Valid @RequestBody SpaceContextDTO dto
+    ) throws MetadataException {
+        AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}", token, dto.getName(), dto.getOrganization().getName());
         if (!authHelper.isSuperuser(token)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
         String accessToken = authService.getSAAccessToken();
-        osCtxService.updateSpaceContext(space, accessToken);
+        osCtxService.updateSpaceContext(dto, accessToken);
 
-        LOG.debug("OpenSearch Space Context for {} updated", space.getName());
+        LOG.debug("OpenSearch Space Context for {} updated", dto.getName());
         return ResponseEntity.ok().build();
     }
 
-    //TODO: adjust roles according to roles-/rights-concept!!
-    @Operation(summary = "Deletes OpenSearch context", description = "Deletes the OpenSearch-context for the specified `Space`, consisting of tenant, roles and rolesmappings")
+    @Operation(summary = "Deletes OpenSearch context", description = "Deletes the OpenSearch-context for the specified `Space`, consisting of tenant, roles " +
+            "and rolesmappings")
     @DeleteMapping(path = "{spaceName}")
     @ApiResponse(responseCode = "200", description = "Successfully deleted OpenSearch-context")
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to delete OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to delete one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> deleteSpaceResources(@Parameter(hidden = true) JwtAuthenticationToken token, @PathVariable String organizationName, @PathVariable String spaceName) throws MetadataException {
+    public ResponseEntity<Void> deleteSpaceResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @PathVariable String organizationName,
+            @PathVariable String spaceName) throws MetadataException {
+        AuditLogger.info(LOG, "Deleting OpenSearch context for space {} in organization {}", token, spaceName, organizationName);
         if (!authHelper.isSuperuser(token)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }

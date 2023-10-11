@@ -15,6 +15,7 @@ limitations under the License.
  */
 package com.efs.sdk.metadata.core.index.application;
 
+import com.efs.sdk.logging.AuditLogger;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.model.ApplicationIndexCreateDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,13 +47,18 @@ public class IndexController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "create application index", description = "Creates an application index with given index mapping, if the caller has sufficient rights for this operation (space trustee)")
+    @Operation(summary = "create application index", description = "Creates an application index with given index mapping, if the caller has sufficient " +
+            "rights for this operation (space trustee)")
     @ApiResponse(responseCode = "201", description = "Successfully created an application index")
     @ApiResponse(responseCode = "400", description = "Custom-name of the application-index is not valid")
     @ApiResponse(responseCode = "403", description = "User does not have the required permissions to create an application-index")
     @ApiResponse(responseCode = "409", description = "Application-index already exists")
-    public ResponseEntity<String> createApplicationIndex(JwtAuthenticationToken token, @RequestBody ApplicationIndexCreateDTO dto) throws MetadataException, IOException {
-        LOG.debug("create application-index: {}", dto);
+    public ResponseEntity<String> createApplicationIndex(JwtAuthenticationToken token, @RequestBody ApplicationIndexCreateDTO dto) throws MetadataException,
+            IOException {
+        AuditLogger.info(LOG, "Creating application index with custom name {} for space {} in organization {}", token, dto.getCustomName(),
+                dto.getSpaceName(), dto.getOrganizationName());
+        LOG.debug("Creating application index with custom name {} for space {} in organization {}", dto.getCustomName(), dto.getSpaceName(),
+                dto.getOrganizationName());
 
         return new ResponseEntity<>(this.indexService.createApplicationIndex(token, dto), HttpStatus.CREATED);
     }
@@ -64,7 +70,8 @@ public class IndexController {
     @ApiResponse(responseCode = "400", description = "Given application-index is not valid")
     @ApiResponse(responseCode = "403", description = "User does not have the required permissions to create an application-index")
     public ResponseEntity<Void> deleteApplicationIndex(JwtAuthenticationToken token, @PathVariable String indexName) throws MetadataException, IOException {
-        LOG.debug("delete application-index: {}", indexName);
+        AuditLogger.info(LOG, "Deleting application index with name {}", token, indexName);
+        LOG.debug("Deleting application index with name {}", indexName);
 
         this.indexService.deleteApplicationIndex(indexName, token);
         return ResponseEntity.noContent().build();
