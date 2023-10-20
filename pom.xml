@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.efs.sdk</groupId>
     <artifactId>metadata</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>metadata</name>
     <description>Metadata backend</description>
 
@@ -191,15 +191,21 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.1</version>
+        </dependency>
+        <!-- SDK libraries -->
+        <dependency>
             <groupId>com.efs.sdk</groupId>
             <artifactId>sdk-common</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>24.0.1</version>
+            <groupId>com.efs.sdk</groupId>
+            <artifactId>sdk-logging</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -223,6 +229,20 @@
                         <phase>prepare-package</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- needed for dependency track report -->
+            <plugin>
+                <groupId>org.cyclonedx</groupId>
+                <artifactId>cyclonedx-maven-plugin</artifactId>
+                <version>2.7.9</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>makeAggregateBom</goal>
                         </goals>
                     </execution>
                 </executions>

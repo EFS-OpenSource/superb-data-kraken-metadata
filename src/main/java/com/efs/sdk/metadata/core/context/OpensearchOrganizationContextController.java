@@ -16,6 +16,7 @@ limitations under the License.
 package com.efs.sdk.metadata.core.context;
 
 import com.efs.sdk.common.domain.dto.OrganizationContextDTO;
+import com.efs.sdk.logging.AuditLogger;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.AuthService;
 import com.efs.sdk.metadata.helper.AuthHelper;
@@ -56,7 +57,8 @@ public class OpensearchOrganizationContextController {
         this.authService = authService;
     }
 
-    @Operation(summary = "Create OpenSearch context for the specified Organization", description = "Creates the opensearch-context for the specified `Organization`, consisting of tenant, roles and rolesmappings")
+    @Operation(summary = "Create OpenSearch context for the specified Organization", description = "Creates the opensearch-context for the specified " +
+            "`Organization`, consisting of tenant, roles and rolesmappings")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('" + AuthHelper.ORG_CREATE_PERMISSION_ROLE + "')")
     @ApiResponse(responseCode = "200", description = "Successfully created OpenSearch-context")
@@ -64,10 +66,14 @@ public class OpensearchOrganizationContextController {
     @ApiResponse(responseCode = "403", description = "User does not have permissions to create OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to create one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> createOrganizationResources(@Parameter(hidden = true) JwtAuthenticationToken token, @Valid @RequestBody OrganizationContextDTO orgDTO) throws MetadataException {
-        LOG.debug("creating opensearch organization context for {}", orgDTO.getName());
+    public ResponseEntity<Void> createOrganizationResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @Valid @RequestBody OrganizationContextDTO dto
+    ) throws MetadataException {
+        AuditLogger.info(LOG, "Creating OpenSearch context for organization {}", token, dto.getName());
+        LOG.debug("Creating OpenSearch context for organization {}", dto.getName());
         String accessToken = authService.getSAAccessToken();
-        osCtxService.createOrganizationContext(accessToken, orgDTO);
+        osCtxService.createOrganizationContext(accessToken, dto);
 
         return ResponseEntity.ok().build();
     }
@@ -80,11 +86,16 @@ public class OpensearchOrganizationContextController {
     @ApiResponse(responseCode = "403", description = "User does not have permissions to update OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to update one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> updateOrganizationResources(@Parameter(hidden = true) JwtAuthenticationToken token, @PathVariable String orgName, @Valid @RequestBody OrganizationContextDTO orgDTO) throws MetadataException {
-        LOG.debug("updating opensearch organization context for {}", orgDTO.getName());
-        orgDTO.setName(orgName);
+    public ResponseEntity<Void> updateOrganizationResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @PathVariable String orgName,
+            @Valid @RequestBody OrganizationContextDTO dto
+    ) throws MetadataException {
+        AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", token, dto.getName());
+        LOG.debug("Updating OpenSearch context for organization {}", dto.getName());
+        dto.setName(orgName);
         String accessToken = authService.getSAAccessToken();
-        osCtxService.updateOrganizationContext(orgDTO, accessToken);
+        osCtxService.updateOrganizationContext(dto, accessToken);
 
         return ResponseEntity.ok().build();
     }
@@ -96,8 +107,12 @@ public class OpensearchOrganizationContextController {
     @ApiResponse(responseCode = "403", description = "User does not have permissions to delete OpenSearch-context")
     @ApiResponse(responseCode = "500", description = "Unable to delete one of the context-types")
     @ApiResponse(responseCode = "502", description = "Connection to OpenSearch unavailable")
-    public ResponseEntity<Void> deleteOrganizationResources(@Parameter(hidden = true) JwtAuthenticationToken token, @PathVariable String organizationName) throws MetadataException {
-        LOG.debug("deleting opensearch organization context for {}", organizationName);
+    public ResponseEntity<Void> deleteOrganizationResources(
+            @Parameter(hidden = true) JwtAuthenticationToken token,
+            @PathVariable String organizationName
+    ) throws MetadataException {
+        AuditLogger.info(LOG, "Deleting OpenSearch context for organization {}", token, organizationName);
+        LOG.debug("Deleting OpenSearch context for organization {}", organizationName);
         if (!authHelper.isSuperuser(token)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }

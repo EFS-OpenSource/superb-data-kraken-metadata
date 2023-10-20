@@ -20,6 +20,7 @@ import com.efs.sdk.common.domain.dto.OrganizationContextDTO;
 import com.efs.sdk.common.domain.dto.SpaceContextDTO;
 import com.efs.sdk.common.domain.model.Capability;
 import com.efs.sdk.common.domain.model.Confidentiality;
+import com.efs.sdk.logging.AuditLogger;
 import com.efs.sdk.metadata.clients.OpenSearchRestClientBuilder;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.OrganizationmanagerService;
@@ -504,13 +505,15 @@ public class OpensearchContextService {
         List<OrganizationContextDTO> organizations = organizationmanagerService.getOrganizations(token);
 
         for (OrganizationContextDTO organization : organizations) {
+            AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", token, organization.getName());
             updateOrganizationContext(organization, token);
             createTenant(organization, token);
 
             List<SpaceContextDTO> spaceContextDTOList = organizationmanagerService.getSpaces(token, organization);
 
-            for (SpaceContextDTO spaceContextDTO : spaceContextDTOList) {
-                updateSpaceContext(spaceContextDTO, token);
+            for (SpaceContextDTO space : spaceContextDTOList) {
+                AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}", token, space.getName(), organization.getName());
+                updateSpaceContext(space, token);
             }
         }
     }
