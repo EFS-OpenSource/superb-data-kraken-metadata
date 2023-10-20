@@ -7,18 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 1.0.1 - 2023-10-17
-
-### Added
-- contributing guide
-
-### Changed
-- none
-
-### Removed
-- none
-
-
 ## 1.1.0 - 2023-10-05
 
 ### Added
@@ -28,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - add configuration to config-map
 - add audit logging to all relevant locations
 - streamline line endings for text files to LF
+- contributing guide
 
 ### Changed
 - none
