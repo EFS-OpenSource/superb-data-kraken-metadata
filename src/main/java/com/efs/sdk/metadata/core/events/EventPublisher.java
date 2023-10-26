@@ -65,9 +65,10 @@ public class EventPublisher {
     /**
      * Sends the message
      *
+     * @param topicName The name of the topic
      * @param message The message
      */
-    public void sendMessage(String message) {
+    public void sendMessage(String topicName, String message) {
         this.taskExecutor.execute(new EventTask(kafkaTemplate, topicName, message));
     }
 

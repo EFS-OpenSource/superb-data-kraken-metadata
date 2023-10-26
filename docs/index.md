@@ -195,9 +195,8 @@ This service provides functionality to index metadata.
 |------|------|-------------|
 | Body |      | metadata    | 
 
-The service extracts this information and stores the metadata in your opensearch-instance (index named ```&lt;org&gt;_&lt;spc&gt;_measurements```). When all is
-done, a message
-of the form
+The service extracts this information and stores the metadata in your opensearch-instance (index named `<org>_<spc>_measurements`). When all is
+done, a message of the form
 
 ```
 {
@@ -221,9 +220,22 @@ will be published to the topic 'indexing-done' (as configured via ```metadata.to
 | RequestParam | docid        | ID of the document to update                                     |
 | Body         |              | metadata and massdata that needs to be added to the current file |
 
-This service gets a JSON with two attributes - `metadata` and `massdata` (if missing not changes will be applied).
+This service gets a JSON with two attributes - `metadata` and `massdata` (if missing no changes will be applied).
 Metadata is an object, the attribute won't overwrite already existing sub-attributes in the old document.
-Massdata is an array, the array adds new file to the existing document if there is no element with the exact same data.
+Massdata is an array, the array adds new file to the existing document if there is no element with the exact same data. When all is
+done, a message of the form
+
+```
+{
+  "space": "<A_SPACE_NAME>",
+  "organization": "<AN_ORGANIZATION_NAME>",
+  "rootDir": "<A_ROOT_DIRECTORY_NAME>",
+  "uuid": "<AN_UUID>"
+}
+```
+
+will be published to the topic 'metadata-update' (as configured via ```metadata.topics.metadata-update-topic```).
+
 
 
 ### TODO further functionality

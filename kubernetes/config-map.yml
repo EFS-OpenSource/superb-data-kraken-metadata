@@ -56,6 +56,7 @@ data:
     metadata:
       topics:
         indexing-done-topic: indexing-done
+        metadata-update-topic: metadata-update
       opensearch:
         url: https://$(elasticsearch-service).elasticsearch.svc.cluster.local:9200
         security-endpoint: $(elasticsearch_security_endpoint)

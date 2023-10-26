@@ -25,12 +25,16 @@ import com.efs.sdk.metadata.model.MeasurementDTO;
 import com.efs.sdk.metadata.model.MetadataDTO;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
+import org.jetbrains.annotations.NotNull;
 import org.opensearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +49,16 @@ public class MetadataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataService.class);
 
+
+    /**
+     * Name of the Kafka-Topic
+     */
+    @Value("${metadata.topics.indexing-done-topic}")
+    private String indexingDoneTopic;
+
+    @Value("${metadata.topics.metadata-update-topic}")
+    private String metadataUpdateTopic;
+
     private final EventPublisher publisher;
     private final EntityConverter converter;
     private final OpenSearchRestClientBuilder esBuilder;
@@ -53,7 +67,8 @@ public class MetadataService {
     private final OrganizationManagerClient orgaClient;
     private final SchemaManagerClient schemaClient;
 
-    public MetadataService(EventPublisher publisher, EntityConverter converter, OpenSearchRestClientBuilder esBuilder, MetadataRestClient client, MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient, SchemaManagerClient schemaClient) {
+    public MetadataService(EventPublisher publisher, EntityConverter converter, OpenSearchRestClientBuilder esBuilder, MetadataRestClient client,
+            MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient, SchemaManagerClient schemaClient) {
         this.publisher = publisher;
         this.converter = converter;
         this.esBuilder = esBuilder;
@@ -130,7 +145,9 @@ public class MetadataService {
         Map<String, Object> inputMetadataFlatten = JsonFlattener.flattenAsMap(converter.metadataValue(input.getMetadata()));
         Map<String, Object> sourceMetadataFlatten = JsonFlattener.flattenAsMap(converter.metadataValue(source.getMetadata()));
 
-        Map<String, Object> mergedFlatten = Stream.of(sourceMetadataFlatten, inputMetadataFlatten).flatMap(map -> map.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+        Map<String, Object> mergedFlatten =
+                Stream.of(sourceMetadataFlatten, inputMetadataFlatten).flatMap(map -> map.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue, (v1, v2) -> v1));
 
         Map<String, Object> mergedMetadata = converter.metadataValue(JsonUnflattener.unflatten(converter.metadataValue(mergedFlatten)));
 
@@ -145,9 +162,46 @@ public class MetadataService {
         result.setMetadata(mergedMetadata);
         result.setMassdataFiles(List.copyOf(massdataFiles));
 
-        int updated = mOSClient.updateMetadata(restClient, index, documentId, converter.metadataValue(result));
+        EventPublisherModelDTO eventPublisherModelDTO = getEventPublisherModelDTO(result);
 
+        LOG.debug("updating");
+        int updated = mOSClient.updateMetadata(restClient, index, documentId, converter.metadataValue(result));
+        LOG.debug("updating done");
+        LOG.debug("publishing event");
+        publisher.sendMessage(metadataUpdateTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
+        LOG.debug("publishing event done");
         return updated > 0;
+    }
+
+    @NotNull
+    private EventPublisherModelDTO getEventPublisherModelDTO(MetadataDTO result) {
+        EventPublisherModelDTO eventPublisherModelDTO = new EventPublisherModelDTO();
+        eventPublisherModelDTO.setAccountName(result.getOrganization());
+        eventPublisherModelDTO.setContainerName(result.getSpace());
+        eventPublisherModelDTO.setRootDir(extractRootDir(result.getMassdataFiles()));
+        eventPublisherModelDTO.setUuid(result.getUuid());
+        return eventPublisherModelDTO;
+    }
+
+    private String extractRootDir(List<MassdataFile> massdataFiles) {
+        List<String> locations = massdataFiles.stream().map(MassdataFile::getLocation).toList();
+        return extractRootDirs(locations);
+    }
+
+    private String extractRootDirs(List<String> locations) {
+        if (locations.isEmpty()) {
+            return "";
+        }
+        Path rootDir = Paths.get(locations.get(0)).getParent();
+
+        for (String relativePath : locations) {
+            Path path = Paths.get(relativePath).getParent();
+            if (path != null && !path.startsWith(rootDir)) {
+                rootDir = path;
+            }
+        }
+
+        return rootDir != null ? rootDir.toString() : "";
     }
 
     private boolean index(MeasurementDTO indexDTO, String accessToken, EventPublisherModelDTO eventPublisherModelDTO) throws MetadataException {
@@ -166,7 +220,7 @@ public class MetadataService {
         int modelIndexed = schemaClient.indexModel(accessToken, index);
         LOG.debug("indexing done");
         LOG.debug("publishing event");
-        publisher.sendMessage(converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
+        publisher.sendMessage(indexingDoneTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
         LOG.debug("publishing event done");
         return indexed > 0 && modelIndexed > 0;
     }
