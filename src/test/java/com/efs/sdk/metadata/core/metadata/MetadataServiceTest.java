@@ -140,7 +140,7 @@ class MetadataServiceTest {
         given(mESClient.getSourceDocument(any(RestClient.class), anyString(), anyString())).willReturn(emptyMap());
         given(mESClient.updateMetadata(any(RestClient.class), anyString(), anyString(), anyString())).willReturn(1);
 
-        assertTrue(service.update(new MetadataDTO(), "", "", "", "some-id"));
+        assertTrue(service.update(new MeasurementDTO(), "", "", "", "some-id"));
     }
 
     @Test
@@ -156,6 +156,6 @@ class MetadataServiceTest {
         given(mESClient.getSourceDocument(any(RestClient.class), anyString(), anyString())).willReturn(foundDocument);
         given(mESClient.updateMetadata(any(RestClient.class), anyString(), anyString(), anyString())).willReturn(1);
 
-        assertTrue(service.update(new MetadataDTO(), "asd", "organization", "space", "id"));
+        assertTrue(service.update(new MeasurementDTO(), "asd", "organization", "space", "id"));
     }
 }

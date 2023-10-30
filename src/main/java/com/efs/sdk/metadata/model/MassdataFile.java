@@ -38,6 +38,9 @@ public class MassdataFile {
         this.size = size;
     }
 
+    public MassdataFile() {
+    }
+
     public String getLocation() {
         return location;
     }
@@ -72,8 +75,12 @@ public class MassdataFile {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MassdataFile that = (MassdataFile) o;
         return Objects.equals(location, that.location) && Objects.equals(name, that.name) && Objects.equals(dateCreated, that.dateCreated) && Objects.equals(size, that.size);
     }

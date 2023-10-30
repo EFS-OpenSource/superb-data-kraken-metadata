@@ -122,10 +122,11 @@ public class MetadataService {
         eventPublisherModelDTO.setAccountName(measurement.getOrganization());
         eventPublisherModelDTO.setContainerName(measurement.getSpace());
         eventPublisherModelDTO.setRootDir(measurement.getRootdir());
+        eventPublisherModelDTO.setUuid(measurement.getDocid());
         return eventPublisherModelDTO;
     }
 
-    public boolean update(MetadataDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException, IOException {
+    public boolean update(MeasurementDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException, IOException {
         if (!canDelete(accessToken, organization, space)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
@@ -138,8 +139,8 @@ public class MetadataService {
         if (source.getMetadata() == null) {
             source.setMetadata(Collections.emptyMap());
         }
-        if (source.getMassdataFiles() == null) {
-            source.setMassdataFiles(Collections.emptyList());
+        if (source.getMassdata() == null) {
+            source.setMassdata(Collections.emptyList());
         }
 
         Map<String, Object> inputMetadataFlatten = JsonFlattener.flattenAsMap(converter.metadataValue(input.getMetadata()));
@@ -152,17 +153,17 @@ public class MetadataService {
         Map<String, Object> mergedMetadata = converter.metadataValue(JsonUnflattener.unflatten(converter.metadataValue(mergedFlatten)));
 
         Set<MassdataFile> massdataFiles = new HashSet<>();
-        massdataFiles.addAll(source.getMassdataFiles());
-        massdataFiles.addAll(input.getMassdataFiles());
+        massdataFiles.addAll(source.getMassdata());
+        massdataFiles.addAll(input.getMassdata());
 
         MetadataDTO result = new MetadataDTO();
         result.setUuid(source.getUuid());
         result.setSpace(source.getSpace());
         result.setOrganization(source.getOrganization());
         result.setMetadata(mergedMetadata);
-        result.setMassdataFiles(List.copyOf(massdataFiles));
+        result.setMassdata(List.copyOf(massdataFiles));
 
-        EventPublisherModelDTO eventPublisherModelDTO = getEventPublisherModelDTO(result);
+        EventPublisherModelDTO eventPublisherModelDTO = getEventPublisherModelDTO(input);
 
         LOG.debug("updating");
         int updated = mOSClient.updateMetadata(restClient, index, documentId, converter.metadataValue(result));
@@ -171,37 +172,6 @@ public class MetadataService {
         publisher.sendMessage(metadataUpdateTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
         LOG.debug("publishing event done");
         return updated > 0;
-    }
-
-    @NotNull
-    private EventPublisherModelDTO getEventPublisherModelDTO(MetadataDTO result) {
-        EventPublisherModelDTO eventPublisherModelDTO = new EventPublisherModelDTO();
-        eventPublisherModelDTO.setAccountName(result.getOrganization());
-        eventPublisherModelDTO.setContainerName(result.getSpace());
-        eventPublisherModelDTO.setRootDir(extractRootDir(result.getMassdataFiles()));
-        eventPublisherModelDTO.setUuid(result.getUuid());
-        return eventPublisherModelDTO;
-    }
-
-    private String extractRootDir(List<MassdataFile> massdataFiles) {
-        List<String> locations = massdataFiles.stream().map(MassdataFile::getLocation).toList();
-        return extractRootDirs(locations);
-    }
-
-    private String extractRootDirs(List<String> locations) {
-        if (locations.isEmpty()) {
-            return "";
-        }
-        Path rootDir = Paths.get(locations.get(0)).getParent();
-
-        for (String relativePath : locations) {
-            Path path = Paths.get(relativePath).getParent();
-            if (path != null && !path.startsWith(rootDir)) {
-                rootDir = path;
-            }
-        }
-
-        return rootDir != null ? rootDir.toString() : "";
     }
 
     private boolean index(MeasurementDTO indexDTO, String accessToken, EventPublisherModelDTO eventPublisherModelDTO) throws MetadataException {
@@ -231,7 +201,7 @@ public class MetadataService {
         metadata.setMetadata(measurement.getMetadata());
         metadata.setSpace(measurement.getSpace());
         metadata.setOrganization(measurement.getOrganization());
-        metadata.setMassdataFiles(measurement.getMassdataFiles());
+        metadata.setMassdata(measurement.getMassdata());
         return metadata;
     }
 

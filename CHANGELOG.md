@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - trigger event, if metadata is updated
 
 ### Changed
-- none
+- use MeasurementDTO when updating metadata
 
 ### Removed
 - none
