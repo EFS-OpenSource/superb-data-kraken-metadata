@@ -82,3 +82,4 @@ data:
       config: classpath:com/efs/sdk/logging/sdk.logback.xml
       level:
         com.efs.sdk: $(logging-level)
+        org.springframework.web: INFO

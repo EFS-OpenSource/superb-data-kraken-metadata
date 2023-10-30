@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add audit logging to all relevant locations
 - streamline line endings for text files to LF
 - contributing guide
+- fix dependency track findings
 
 ### Changed
 - none

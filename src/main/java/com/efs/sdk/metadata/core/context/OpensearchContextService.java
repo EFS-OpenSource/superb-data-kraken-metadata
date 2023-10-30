@@ -25,6 +25,7 @@ import com.efs.sdk.metadata.clients.OpenSearchRestClientBuilder;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.OrganizationmanagerService;
 import com.efs.sdk.metadata.helper.OpensearchHelper;
+import com.efs.sdk.metadata.helper.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -505,14 +506,16 @@ public class OpensearchContextService {
         List<OrganizationContextDTO> organizations = organizationmanagerService.getOrganizations(token);
 
         for (OrganizationContextDTO organization : organizations) {
-            AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", token, organization.getName());
+            AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", Utils.getSubjectAsToken(),
+                    organization.getName());
             updateOrganizationContext(organization, token);
             createTenant(organization, token);
 
             List<SpaceContextDTO> spaceContextDTOList = organizationmanagerService.getSpaces(token, organization);
 
             for (SpaceContextDTO space : spaceContextDTOList) {
-                AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}", token, space.getName(), organization.getName());
+                AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}",
+                        Utils.getSubjectAsToken(), space.getName(), organization.getName());
                 updateSpaceContext(space, token);
             }
         }

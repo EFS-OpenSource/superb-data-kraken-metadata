@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return handleMetadataException(new MetadataException(OPENSEARCH_ERROR), request);
         }
         if (e.getResponse().getStatusLine().getStatusCode() >= 400 && e.getResponse().getStatusLine().getStatusCode() < 500) {
-            LOG.debug(e.getMessage(), e);
+            LOG.error(e.getMessage(), e);
             return handleMetadataException(new MetadataException(OPENSEARCH_BAD_REQUEST, e.getMessage()), request);
         }
         LOG.error(e.getMessage(), e);
@@ -56,7 +56,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = MetadataException.class)
     private ResponseEntity<Object> handleMetadataException(MetadataException e, WebRequest request) {
-        LOG.debug(e.getMessage(), e);
+        LOG.error(e.getMessage(), e);
         return handleExceptionInternal(e, e.getMessage(), new HttpHeaders(), e.getHttpStatus(), request);
     }
 
@@ -68,14 +68,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
     protected ResponseEntity<Object> handleAccessDeniedException(RuntimeException e, WebRequest request) {
-        LOG.debug(e.getMessage(), e);
+        LOG.error(e.getMessage(), e);
         return handleMetadataException(new MetadataException(INSUFFICIENT_RIGHTS), request);
     }
 
     // handle validation errors
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NotNull MethodArgumentNotValidException ex, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest request) {
-        LOG.debug(ex.getMessage(), ex);
+        LOG.error(ex.getMessage(), ex);
         List<String> errors = ex.getBindingResult().getAllErrors().stream().map(error -> {
             if (error instanceof FieldError fieldError) {
                 return fieldError.getField() + ": " + error.getDefaultMessage();
