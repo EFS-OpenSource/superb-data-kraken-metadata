@@ -64,7 +64,7 @@ public class EventPublisher {
      * @param message   The message
      */
     public void sendMessage(String topicName, String message) {
-        LOG.debug(format("sending event '{}' to topic '{}'", message, topicName));
+        LOG.debug("sending event '{}' to topic '{}'", message, topicName);
         this.taskExecutor.execute(new EventTask(kafkaTemplate, topicName, message));
     }
 
