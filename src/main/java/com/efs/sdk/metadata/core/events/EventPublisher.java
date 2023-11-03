@@ -17,7 +17,6 @@ package com.efs.sdk.metadata.core.events;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -44,12 +43,6 @@ public class EventPublisher {
      * Instance of the KafkaTemplate
      */
     private final KafkaTemplate<String, String> kafkaTemplate;
-
-    /**
-     * Name of the Kafka-Topic
-     */
-    @Value("${metadata.topics.indexing-done-topic}")
-    private String topicName;
 
     private final TaskExecutor taskExecutor;
 
