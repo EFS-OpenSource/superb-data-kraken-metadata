@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+import static java.lang.String.format;
+
 /**
  * Service for Event-publishing
  *
@@ -66,9 +68,10 @@ public class EventPublisher {
      * Sends the message
      *
      * @param topicName The name of the topic
-     * @param message The message
+     * @param message   The message
      */
     public void sendMessage(String topicName, String message) {
+        LOG.debug(format("sending event '{}' to topic '{}'", message, topicName));
         this.taskExecutor.execute(new EventTask(kafkaTemplate, topicName, message));
     }
 
