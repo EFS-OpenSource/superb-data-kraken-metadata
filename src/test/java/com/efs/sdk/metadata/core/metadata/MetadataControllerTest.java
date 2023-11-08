@@ -17,6 +17,7 @@ package com.efs.sdk.metadata.core.metadata;
 
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.SchemaService;
+import com.efs.sdk.metadata.model.MeasurementDTO;
 import com.efs.sdk.metadata.model.MetadataDTO;
 import com.efs.sdk.metadata.security.oauth.OAuthConfigurationHelper;
 import org.junit.jupiter.api.Test;
@@ -71,7 +72,7 @@ class MetadataControllerTest {
 
     @Test
     void givenAuthentication_whenPutIndex_thenResponseError() throws Exception {
-        given(metadataService.update(any(MetadataDTO.class), anyString(), anyString(), anyString(), anyString())).willThrow(new IOException("test"));
+        given(metadataService.update(any(MeasurementDTO.class), anyString(), anyString(), anyString(), anyString())).willThrow(new IOException("test"));
 
         mvc.perform(put(INDEX_JSON_ENDPOINT).with(jwt()).param("organization", "sdkcorestorage").param("space", "test-container").param("docid", "qweqweqwe").contentType(MediaType.APPLICATION_JSON).content("{}")).andExpect(status().is5xxServerError());
     }

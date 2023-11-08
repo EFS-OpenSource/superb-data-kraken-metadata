@@ -57,7 +57,7 @@ class EntityConverterTest {
         dto.setOrganization("my-organization");
         dto.setUuid(UUID.randomUUID().toString());
         dto.setMetadata(Map.of("property1", "value1", "property2", "value2"));
-        dto.setMassdataFiles(List.of(new MassdataFile("location", "name", ZonedDateTime.now(), 123456)));
+        dto.setMassdata(List.of(new MassdataFile("location", "name", ZonedDateTime.now(), 123456)));
 
         assertNotNull(converter.metadataValue(dto));
     }

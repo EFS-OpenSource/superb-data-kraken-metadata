@@ -1,0 +1,594 @@
+apidoc:
+  title: SDK Metadata-API
+sdk:
+  oauth2:
+    client-id: $(CLIENT_ID)
+    authorization-grant-type: authorization_code
+    scope: openid
+    user-name-attribute: preferred_username
+    config-url: https://$(DOMAIN)/auth/realms/$(REALM)/.well-known/openid-configuration
+server:
+  port: 8091
+  servlet:
+    context-path: /metadata
+spring:
+  kafka:
+    admin:
+      fail-fast: true
+    bootstrap-servers: sdk-eventhub-dev.servicebus.windows.net:9093
+    properties:
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://sdk-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=sdk-eventhub-dev-sendlisten;SharedAccessKey=<PASSWORD>";
+      security:
+        protocol: SASL_SSL
+      group:
+        id: $Default
+metadata:
+  topics:
+    indexing-done-topic: indexing-done
+    metadata-update-topic: metadata-update
+  opensearch:
+    url: http://localhost:9200
+    security-endpoint: /_plugins/_security/api
+  auth:
+    client-id: $(CLIENT_ID)
+    client-secret: <CLIENT_SECRET>
+  organizationmanager-endpoints:
+    organization: https://$(DOMAIN)/organizationmanager/api/v1.0/organization
+    #    organization: http://localhost:<PORT>/organizationmanager/api/v1.0/organization
+    space: https://$(DOMAIN)/organizationmanager/api/v1.0/space
+  schemamanager-endpoints:
+    modelindex: https://$(DOMAIN)/schemamanager/v1.0/modelindex
+  #    modelindex: http://localhost:<PORT>/schemamanager/v1.0/modelindex
+  schema:
+    meta-json-schema: |-
+      {
+        "$schema": "https://json-schema.org/draft/2019-09/schema",
+        "title": "v4_0_0 - Case related meta information",
+        "$id": "v4_0_0",
+        "description": " As basic elements of a project are considered not to be files, but cases, which as the name says describe a case, a measurement, a measurement series or similar. This can be a measurement run in a test vehicle, a coffee grinder quality evaluation or an annual report documentation. This schema should list all the necessary entities and attributes of the entities to fully describe one case. The schema provides only a frame, which should help customers and provide them a possible solution to describe their data. If one uses this model, then there are required entities, attributes, and some, which are optional but out of experience from many projects in the car industry in some cases probably helpful. On the top entity level, the schema is freely extendable.",
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "dateTime",
+          "project",
+          "scope",
+          "environment",
+          "authors",
+          "data",
+          "entities"
+        ],
+        "properties": {
+          "name": {
+            "title": "Case name",
+            "type": "string",
+            "default": "",
+            "examples": ["Double lane change"],
+            "pattern": "^.*$"
+          },
+          "description": {
+            "title": "Case description",
+            "type": "string",
+            "default": "",
+            "examples": ["Double lane change, with fast steering wheel movement and throttle position of 100%"],
+            "pattern": "^.*$"
+          },
+          "dateTime": {
+            "title": "Time information - project specific pattern description for some attributes",
+            "description": "All informaiton which is time related like, creation date or retention time.",
+            "type": "object",
+            "$ref": "#/definitions/dateTimeRef"
+          },
+          "customers": {
+            "title": "Customer list",
+            "type": "array",
+            "required": ["name", "contactPersons", "address"],
+            "properties": {
+              "name": {
+                "title": "Customer name",
+                "type": "string",
+                "default": "",
+                "examples": ["Audi"],
+                "pattern": "^.*$"
+              },
+              "department": {
+                "title": "Department Sign of customer",
+                "type": "string",
+                "default": "",
+                "examples": ["EFB-262"],
+                "pattern": "^.*$"
+              },
+              "contactPersons": {
+                "title": "Contact persons at customer",
+                "type": "array",
+                "default": [],
+                "$ref": "#/definitions/contactPersonsDef"
+              },
+              "address": {
+                "title": "Address",
+                "type": "object",
+                "$ref": "#/definitions/addressDef"
+              }
+            }
+          },
+          "project": {
+            "title": "Project information - project specific pattern description for some attributes",
+            "type": "object",
+            "required": ["name", "type", "confidentiality", "purpose"],
+            "properties": {
+              "name": {
+                "title": "Project name",
+                "type": "string",
+                "default": "",
+                "examples": ["Development of the stability control system of the D5 platform"],
+                "pattern": "^.*$"
+              },
+              "dateTime": {
+                "title": "Time information - project specific pattern description for some attributes",
+                "description": "All informaiton which is time related like, creation or retention time.",
+                "type": "object",
+                "$ref": "#/definitions/dateTimeRef"
+              },
+              "type": {
+                "title": "Project type classfication - project specific pattern description",
+                "description": "Specifies the project type. Which labeling is to be used should be defined project specific. An example would be the differentiation between internal and external projects.",
+                "type": "string",
+                "default": "",
+                "examples": ["internal"],
+                "pattern": "^.*$"
+              },
+              "costCenters": {
+                "title": "Cost center definition if relevant",
+                "description": "Defines one or more cost centers, on which the project costs must be booked.",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "title": "Items",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["AT-00051234-BG"],
+                  "pattern": "^.*$"
+                }
+              },
+              "confidentiality": {
+                "title": "Confidentiality - project specific pattern description",
+                "desctiption": "Specifies the confidentiality level of the project if relevant.",
+                "type": "string",
+                "default": "",
+                "examples": ["public"],
+                "pattern": "^.*$"
+              },
+              "purpose": {
+                "title": "Project purpose",
+                "description": "A brief description of the project.",
+                "type": "string",
+                "default": "",
+                "examples": [
+                  "Series development and release of the Stability control of the MLB evo Plattform D Series."
+                ],
+                "pattern": "^.*$"
+              }
+            }
+          },
+          "scope": {
+            "title": "Scope of the case - project specific pattern description for some attributes",
+            "type": "object",
+            "required": ["name", "purpose", "confidentiality"],
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string",
+                "default": "",
+                "examples": ["Development SW Baseline 1"],
+                "pattern": "^.*$"
+              },
+              "dateTime": {
+                "title": "Scope realted time information",
+                "description": "All informaiton which is time related like, creation or retention time.",
+                "type": "object",
+                "$ref": "#/definitions/dateTimeRef"
+              },
+              "purpose": {
+                "title": "Purpose of the scope",
+                "type": "string",
+                "default": "",
+                "examples": [
+                  "Development of functions on high-µ friction surface and internal release."
+                ],
+                "pattern": "^.*$"
+              },
+              "confidentiality": {
+                "title": "Confidentiality level - project specific pattern description",
+                "type": "string",
+                "default": "",
+                "examples": ["internal"],
+                "pattern": "^.*$"
+              },
+              "releaseLevel": {
+                "title": "Release level of the scope - project specific pattern description",
+                "type": "string",
+                "default": "",
+                "examples": ["Version 1.2.2"],
+                "pattern": "^.*$"
+              },
+              "tags": {
+                "title": "Tags - project specific pattern description",
+                "description": "The tags array should give the user the possibility to tag the scope with a series of meaningful words or expressions to help the search on some basic content.",
+                "type": "array",
+                "default": [],
+                "examples": [
+                  "SW Baseline 1", "Lanechange preload", "high-µ, internal release"
+                ],
+                "$ref": "#/definitions/tagsDef"
+              }
+            }
+          },
+          "environment": {
+            "title": "Case environment",
+            "description": "Case environment descriptions.",
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "title": "Environment name",
+                "type": "string",
+                "default": "",
+                "examples": ["Idiada Proving Ground"],
+                "pattern": "^.*$"
+              },
+              "description": {
+                "title": "Environment description",
+                "type": "string",
+                "default": "",
+                "examples": ["Some proving ground offering expensive lunch"],
+                "pattern": "^.*$"
+              },
+              "contactPersons": {
+                "title": "Environment contact persons",
+                "type": "array",
+                "default": [],
+                "$ref": "#/definitions/contactPersonsDef"
+              },
+              "address": {
+                "title": "Environment address",
+                "type": "object",
+                "$ref": "#/definitions/addressDef"
+              },
+              "longitude": {
+                "title": "Array of longitude markers of the environment",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "title": "Items",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["48.767741"],
+                  "pattern": "^.*$"
+                }
+              },
+              "latitude": {
+                "title": "Array of latitude markers of the environment",
+                "type": "array",
+                "default": [],
+                "items": {
+                  "title": "Items",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["48.767741"],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          },
+          "authors": {
+            "title": "Case authors",
+            "type": "array",
+            "default": [],
+            "$ref": "#/definitions/contactPersonsDef"
+          },
+          "data": {
+            "title": "Case data list",
+            "description": "List of the case related files and their description",
+            "type": "array",
+            "default": [],
+            "items": {
+              "title": "Items",
+              "type": "object",
+              "required": ["name", "dateTime"],
+              "properties": {
+                "name": {
+                  "title": "File name",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "1212381203.zip"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "format": {
+                  "title": "MIME type format definition if exists",
+                  "description": "Common MIME type list - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types",
+                  "type": "string",
+                  "default": "",
+                  "examples": [
+                    "application/zip"
+                  ],
+                  "pattern": "^.*$"
+                },
+                "dateTime": {
+                  "title": "Data related time information",
+                  "description": "All informaiton which is time related like, creation or retention time.",
+                  "type": "object",
+                  "$ref": "#/definitions/dateTimeRef"
+                },
+                "relatedToEntities": {
+                  "title": "Name of the entity. Link between data and entity, like sensors, laptop, other measuring equipment, parts etc.",
+                  "type": "array",
+                  "default": [],
+                  "items": {
+                    "title": "Items",
+                    "type": "string",
+                    "default": "",
+                    "examples": ["HN-IZ6180"],
+                    "pattern": "^.*$"
+                  }
+                }
+              }
+            }
+          },
+          "entities": {
+            "title": "Case entity list - project specific pattern description for some attributes",
+            "description": "Entities, which were part of the case.",
+            "type": "array",
+            "default": [],
+            "items": {
+              "title": "Items",
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": {
+                  "title": "Entiy name",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["HN-IZ6180"],
+                  "pattern": "^.*$"
+                },
+                "specification": {
+                  "title": "Entity specification - project specific pattern description",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["Some car"],
+                  "pattern": "^.*$"
+                },
+                "licensing": {
+                  "title": "Licensing",
+                  "type": "object",
+                  "properties": {
+                    "form": {
+                      "title": "License type",
+                      "description": "Type of a license e. g. open source, freeware, public domain, proprietary. A list of types of SW licenses, https://www.bsh-ag.de/it-wissensdatenbank/lizenz/",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "Open source license"
+                      ],
+                      "pattern": "^.*$"
+                    },
+                    "definition": {
+                      "title":"License description",
+                      "description": "Brief description of the license type and list of possible restrictions.",
+                      "type": "string",
+                      "default": "",
+                      "pattern": "^.*$"
+                    },
+                    "identifier": {
+                      "title": "SPDX Identifier if exists",
+                      "description": "If identifier exists, as for some free and open source SW it is defined, for example in the SPDX license list, https://spdx.org/licenses/#:~:text=SPDX%20License%20List%20%20%20%20Full%20name,%20%20%20%2041%20more%20rows%20",
+                      "type": "string",
+                      "default": "",
+                      "examples": [
+                        "Apache-2.0"
+                      ],
+                      "pattern": "^.*$"
+                    }
+                  }
+                },
+                "type": {
+                  "title": "Entity type - project specific pattern description",
+                  "description": "For the project meaningful description of an entity type like - equipment, unit under test, scenario, software.",
+                  "type": "string",
+                  "default": "",
+                  "examples": ["unit under test"],
+                  "pattern": "^.*$"
+                }
+              }
+            }
+          },
+          "tags": {
+            "title": "Case tags - project specific pattern description",
+            "description": "The tags array should give the user the possibility to tag the scope with a series of meaningful words or expressions to help the search on some basic content.",
+            "type": "array",
+            "default": [],
+            "examples": [
+              "SW Baseline 1", "Lanechange preload", "high-µ, internal release, throttle 100%"
+            ],
+            "$ref": "#/definitions/tagsDef"
+          },
+          "result": {
+            "title": "Case result",
+            "type": "object",
+            "propertyNames": {
+              "anyOf": [
+                {
+                  "enum": ["passed", "comment"]
+                }
+              ]
+            },
+            "required": ["passed", "comment"],
+            "properties": {
+              "passed": {
+                "type": "boolean",
+                "examples": [true],
+                "default": true
+              },
+              "comment": {
+                "type": "string",
+                "default": "",
+                "examples": ["Stable behavior"],
+                "pattern": "^.*$"
+              }
+            }
+          }
+        },
+        "definitions": {
+          "tagsDef": {
+            "title": "Tag items",
+            "type": "array",
+            "default": "",
+            "examples": [
+              "SW Baseline 1", "Lanechange preload", "high-µ, internal release, throttle 100%"
+            ],
+            "pattern": "^.*$"
+          },
+          "contactPersonsDef": {
+            "title": "Items",
+            "type": "array",
+            "required": ["name", "telephone", "email"],
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string",
+                "default": "",
+                "examples": ["Max Musterman"],
+                "pattern": "^.*$"
+              },
+              "telephone": {
+                "title": "Telephone",
+                "type": "string",
+                "default": "",
+                "examples": ["+49 1234 5678"]
+              },
+              "email": {
+                "title": "Email",
+                "type": "string",
+                "default": "",
+                "examples": ["some.some@some.com"],
+                "format": "email"
+              }
+            }
+          },
+          "addressDef": {
+            "title": "Address information",
+            "type": "object",
+            "required": ["houseNumber", "street", "city", "postalCode", "country"],
+            "properties": {
+              "houseNumber": {
+                "title": "House number",
+                "type": "string",
+                "default": "",
+                "examples": ["1"],
+                "pattern": "^.*$"
+              },
+              "street": {
+                "title": "Street",
+                "type": "string",
+                "default": "",
+                "examples": ["PVG Street"],
+                "pattern": "^.*$"
+              },
+              "city": {
+                "title": "City",
+                "type": "string",
+                "default": "",
+                "examples": ["Santa Oliva"],
+                "pattern": "^.*$"
+              },
+              "postalCode": {
+                "title": "Postalcode",
+                "type": "string",
+                "default": "",
+                "examples": ["654655"],
+                "pattern": "^.*$"
+              },
+              "country": {
+                "title": "Country",
+                "type": "string",
+                "default": "",
+                "examples": ["Spain"],
+                "pattern": "^.*$"
+              }
+            }
+          },
+          "dateTimeRef": {
+            "title": "All informaiton which is time related like, creation date or retention time.",
+            "type": "object",
+            "required": ["createdAt"],
+            "properties": {
+              "createdAt": {
+                "title": "Date of creation",
+                "type": "string",
+                "default": "",
+                "examples": ["2021-09-07T13:55:17+0200"],
+                "anyOf": [
+                  {
+                    "format": "date-time"
+                  },
+                  {
+                    "format": "date"
+                  }
+                ]
+              },
+              "startedAt": {
+                "title": "Date of creation starting time if relevant",
+                "type": "string",
+                "default": "",
+                "examples": ["2021-09-07T13:55:17+0200"],
+                "anyOf": [
+                  {
+                    "format": "date-time"
+                  },
+                  {
+                    "format": "date"
+                  }
+                ]
+              },
+              "endedAt": {
+                "title": "Date of creation stopping time if relevant",
+                "type": "string",
+                "default": "",
+                "examples": ["2021-09-07T13:55:17+0200"],
+                "anyOf": [
+                  {
+                    "format": "date-time"
+                  },
+                  {
+                    "format": "date"
+                  }
+                ]
+              },
+              "retentionTime": {
+                "title":"Retention time - project specific pattern description",
+                "description": "Time period counting from creation time after which the entity related information/data can be deleted.",
+                "type": "string",
+                "default": "",
+                "examples": ["5"]
+              }
+            }
+          }
+        }
+      }
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [
+          prometheus,
+          health,
+          info
+        ]
+  health:
+    opensearch:
+      enabled: false
