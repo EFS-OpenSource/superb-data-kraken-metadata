@@ -117,7 +117,7 @@ stages:
 
     jobs:
       - deployment: Deploy
-        timeoutInMinutes: 3
+        timeoutInMinutes: 4
         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
         displayName: Deploy
         environment: 'dev'

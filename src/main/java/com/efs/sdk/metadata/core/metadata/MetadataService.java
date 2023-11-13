@@ -25,7 +25,6 @@ import com.efs.sdk.metadata.model.MeasurementDTO;
 import com.efs.sdk.metadata.model.MetadataDTO;
 import com.github.wnameless.json.flattener.JsonFlattener;
 import com.github.wnameless.json.unflattener.JsonUnflattener;
-import org.jetbrains.annotations.NotNull;
 import org.opensearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,17 +62,15 @@ public class MetadataService {
     private final MetadataRestClient client;
     private final MetadataOpensearchClient mOSClient;
     private final OrganizationManagerClient orgaClient;
-    private final SchemaManagerClient schemaClient;
 
     public MetadataService(EventPublisher publisher, EntityConverter converter, OpenSearchRestClientBuilder esBuilder, MetadataRestClient client,
-            MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient, SchemaManagerClient schemaClient) {
+            MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient) {
         this.publisher = publisher;
         this.converter = converter;
         this.esBuilder = esBuilder;
         this.client = client;
         this.mOSClient = mOSClient;
         this.orgaClient = orgaClient;
-        this.schemaClient = schemaClient;
     }
 
     public boolean index(String accessToken, MeasurementDTO measurement) throws MetadataException {
@@ -126,7 +121,8 @@ public class MetadataService {
         return eventPublisherModelDTO;
     }
 
-    public boolean update(MeasurementDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException, IOException {
+    public boolean update(MeasurementDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException,
+            IOException {
         if (!canDelete(accessToken, organization, space)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
@@ -187,12 +183,11 @@ public class MetadataService {
         LOG.debug("indexing");
 
         int indexed = mOSClient.createMetadata(restClient, index, metadataValue, indexDTO.getDocid());
-        int modelIndexed = schemaClient.indexModel(accessToken, index);
         LOG.debug("indexing done");
         LOG.debug("publishing event");
         publisher.sendMessage(indexingDoneTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
         LOG.debug("publishing event done");
-        return indexed > 0 && modelIndexed > 0;
+        return indexed > 0;
     }
 
     private MetadataDTO getMetadataDTO(MeasurementDTO measurement) {

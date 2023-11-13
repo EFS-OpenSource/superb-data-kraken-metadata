@@ -86,8 +86,12 @@ public class MetadataDTO extends HashMap<String, Object> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MetadataDTO that = (MetadataDTO) o;
         return Objects.equals(getUuid(), that.getUuid());
     }

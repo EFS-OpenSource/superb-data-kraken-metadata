@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-## 1.2.0 - 2023-10-26
+## 1.2.0 - 2023-11-15
 
 ### Added
 - trigger event, if metadata is updated
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - use MeasurementDTO when updating metadata
 
 ### Removed
-- none
+- modelindex-functionality
 
 ---
 

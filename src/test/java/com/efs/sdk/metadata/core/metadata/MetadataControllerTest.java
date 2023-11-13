@@ -18,7 +18,6 @@ package com.efs.sdk.metadata.core.metadata;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.SchemaService;
 import com.efs.sdk.metadata.model.MeasurementDTO;
-import com.efs.sdk.metadata.model.MetadataDTO;
 import com.efs.sdk.metadata.security.oauth.OAuthConfigurationHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

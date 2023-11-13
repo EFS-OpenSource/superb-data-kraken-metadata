@@ -41,7 +41,8 @@ public class MetadataRestClient {
      *
      * @param restTemplate The rest-template
      */
-    public MetadataRestClient(RestTemplate restTemplate, @Value("${metadata.auth.client-id}") String clientId, @Value("${metadata.auth.client-secret}") String clientSecret, OAuthConfigurationHelper configHelper) {
+    public MetadataRestClient(RestTemplate restTemplate, @Value("${metadata.auth.client-id}") String clientId,
+            @Value("${metadata.auth.client-secret}") String clientSecret, OAuthConfigurationHelper configHelper) {
         this.restTemplate = restTemplate;
         OAuthConfiguration oauthConfig = configHelper.getOpenidConfigProperty();
         this.tokenEndpoint = oauthConfig.tokenEndpoint();

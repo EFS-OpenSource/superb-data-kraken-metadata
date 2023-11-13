@@ -24,8 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
-import static java.lang.String.format;
-
 /**
  * Service for Event-publishing
  *

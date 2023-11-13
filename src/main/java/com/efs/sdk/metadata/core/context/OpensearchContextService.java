@@ -78,7 +78,9 @@ public class OpensearchContextService {
      *
      * @param organizationmanagerService The organizationmanager service
      */
-    public OpensearchContextService(OrganizationmanagerService organizationmanagerService, OpenSearchRestClientBuilder clientBuilder, OpensearchHelper opensearchHelper, ObjectMapper objectMapper, @Value("${metadata.opensearch.security-endpoint}") String opensearchSecurityEndpoint) {
+    public OpensearchContextService(OrganizationmanagerService organizationmanagerService, OpenSearchRestClientBuilder clientBuilder,
+            OpensearchHelper opensearchHelper, ObjectMapper objectMapper,
+            @Value("${metadata.opensearch.security-endpoint}") String opensearchSecurityEndpoint) {
         this.clientBuilder = clientBuilder;
         this.objectMapper = objectMapper;
         this.endpointRoles = opensearchSecurityEndpoint + "/roles";
@@ -179,11 +181,13 @@ public class OpensearchContextService {
         String organizationName = organization.getName();
 
         if (Confidentiality.PUBLIC.equals(organization.getConfidentiality())) {
-            createRole(restClient, opensearchHelper.getTenantRoleRequest(KIBANA_ALL_READ, organizationName), opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC));
+            createRole(restClient, opensearchHelper.getTenantRoleRequest(KIBANA_ALL_READ, organizationName),
+                    opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC));
         } else {
             for (RoleScopeOrganization scope : RoleScopeOrganization.values()) {
                 for (String role : scope.getRoles()) {
-                    createRole(restClient, opensearchHelper.getTenantRoleRequest(scope.getPermission(), organizationName), opensearchHelper.getOrganizationRoleName(organizationName, role));
+                    createRole(restClient, opensearchHelper.getTenantRoleRequest(scope.getPermission(), organizationName),
+                            opensearchHelper.getOrganizationRoleName(organizationName, role));
                 }
             }
         }
@@ -202,11 +206,13 @@ public class OpensearchContextService {
         String organizationName = organization.getName();
 
         if (Confidentiality.PUBLIC.equals(organization.getConfidentiality())) {
-            createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC), opensearchHelper.getRolesMappingJson(Collections.singletonList(ORG_ALL_PUBLIC)));
+            createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC),
+                    opensearchHelper.getRolesMappingJson(Collections.singletonList(ORG_ALL_PUBLIC)));
         } else {
             for (RoleScopeOrganization scope : RoleScopeOrganization.values()) {
                 for (String role : scope.getRoles()) {
-                    createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, role), opensearchHelper.getRolesMappingJson(Collections.singletonList(format("org_%s_%s", organizationName, role))));
+                    createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, role),
+                            opensearchHelper.getRolesMappingJson(Collections.singletonList(format("org_%s_%s", organizationName, role))));
                 }
             }
         }

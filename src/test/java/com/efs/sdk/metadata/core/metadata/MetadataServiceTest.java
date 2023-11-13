@@ -20,7 +20,6 @@ import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.events.EventPublisher;
 import com.efs.sdk.metadata.helper.EntityConverter;
 import com.efs.sdk.metadata.model.MeasurementDTO;
-import com.efs.sdk.metadata.model.MetadataDTO;
 import com.efs.sdk.metadata.model.TokenModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,8 +58,6 @@ class MetadataServiceTest {
     private MetadataOpensearchClient mESClient;
     @MockBean
     private OrganizationManagerClient orgaClient;
-    @MockBean
-    private SchemaManagerClient schemaClient;
     private MetadataService service;
 
     @BeforeEach
@@ -72,8 +69,7 @@ class MetadataServiceTest {
         this.client = Mockito.mock(MetadataRestClient.class);
         this.mESClient = Mockito.mock(MetadataOpensearchClient.class);
         this.orgaClient = Mockito.mock(OrganizationManagerClient.class);
-        this.schemaClient = Mockito.mock(SchemaManagerClient.class);
-        this.service = new MetadataService(publisher, converter, esClientBuilder, client, mESClient, orgaClient, schemaClient);
+        this.service = new MetadataService(publisher, converter, esClientBuilder, client, mESClient, orgaClient);
     }
 
     @Test
@@ -114,7 +110,7 @@ class MetadataServiceTest {
 
     @Test
     @Disabled("somehow MetadataElasticsearchClient.createMetadata returns 0 despite assumption -> check again!!")
-    // TODO
+        // TODO
     void givenMetadata_whenIndex_thenOk() throws Exception {
         Map<String, Object> space = Map.of("name", "container");
 
@@ -125,7 +121,6 @@ class MetadataServiceTest {
 
         given(mESClient.createMetadata(any(), anyString(), anyString(), anyString())).willReturn(1);
         given(orgaClient.getSpace(anyString(), anyString(), anyString(), any(OrganizationManagerClient.Permissions.class))).willReturn(space);
-        given(schemaClient.indexModel(anyString(), anyString())).willReturn(1);
 
         ObjectMapper mapper = new ObjectMapper();
 

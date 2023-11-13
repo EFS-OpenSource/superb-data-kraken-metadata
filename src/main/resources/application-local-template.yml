@@ -39,9 +39,6 @@ metadata:
     organization: https://$(DOMAIN)/organizationmanager/api/v1.0/organization
     #    organization: http://localhost:<PORT>/organizationmanager/api/v1.0/organization
     space: https://$(DOMAIN)/organizationmanager/api/v1.0/space
-  schemamanager-endpoints:
-    modelindex: https://$(DOMAIN)/schemamanager/v1.0/modelindex
-  #    modelindex: http://localhost:<PORT>/schemamanager/v1.0/modelindex
   schema:
     meta-json-schema: |-
       {

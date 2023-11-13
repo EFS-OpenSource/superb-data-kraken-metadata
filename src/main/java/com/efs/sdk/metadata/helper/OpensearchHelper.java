@@ -121,9 +121,8 @@ public class OpensearchHelper {
         String tenantPermission = scope.getTenantPermission();
         String indexPattern = format("%s_%s_*", space.getOrganization().getName(), space.getName());
         String[] indexPermissions = scope.getIndexPermissions();
-        String modelindexPermission = scope.getModelindexPermission();
 
-        return replaceTemplateParameters(tenantPattern, tenantPermission, indexPattern, indexPermissions, modelindexPermission);
+        return replaceTemplateParameters(tenantPattern, tenantPermission, indexPattern, indexPermissions);
     }
 
     /**
@@ -137,9 +136,8 @@ public class OpensearchHelper {
         String tenantPermission = "kibana_all_read";
         String indexPattern = format("%s_%s_*", space.getOrganization().getName(), space.getName());
         String[] indexPermissions = new String[]{"read", "indices:data/read/scroll", "indices:admin/mappings/get"};
-        String modelindexPermission = "read";
 
-        return replaceTemplateParameters(tenantPattern, tenantPermission, indexPattern, indexPermissions, modelindexPermission);
+        return replaceTemplateParameters(tenantPattern, tenantPermission, indexPattern, indexPermissions);
     }
 
     /**
@@ -149,10 +147,9 @@ public class OpensearchHelper {
      * @param tenantPermission     a String representing the tenant permission
      * @param indexPattern         a String representing the index pattern
      * @param indexPermissions     an array of Strings representing index permissions
-     * @param modelindexPermission a String representing the model index permission
      * @return a String containing the processed role definition template
      */
-    private String replaceTemplateParameters(String tenantPattern, String tenantPermission, String indexPattern, String[] indexPermissions, String modelindexPermission) {
+    private String replaceTemplateParameters(String tenantPattern, String tenantPermission, String indexPattern, String[] indexPermissions) {
         String roleTemplate = getResourceAsString(ROLE_TEMPLATE_PATH);
         roleTemplate = roleTemplate.replace("<tenant_pattern>", tenantPattern);
         roleTemplate = roleTemplate.replace("<tenant_allowed_action>", tenantPermission);
@@ -164,7 +161,6 @@ public class OpensearchHelper {
             throw new IllegalStateException("Error while converting index permissions to JSON", e);
         }
         roleTemplate = roleTemplate.replace("<index_allowed_actions>", permissionsJson);
-        roleTemplate = roleTemplate.replace("<modelindex_allowed_action>", modelindexPermission);
 
         return roleTemplate;
     }

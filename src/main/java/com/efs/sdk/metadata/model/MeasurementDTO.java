@@ -94,8 +94,12 @@ public class MeasurementDTO extends HashMap<String, Object> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MeasurementDTO that = (MeasurementDTO) o;
         return Objects.equals(getDocid(), that.getDocid());
     }

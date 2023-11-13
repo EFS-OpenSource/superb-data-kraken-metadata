@@ -99,7 +99,11 @@ public class MetadataController {
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to update document")
     @ApiResponse(responseCode = "507", description = "Unable to retrieve the indexed document")
-    public ResponseEntity<Boolean> indexPut(@Parameter(hidden = true) JwtAuthenticationToken token, @Parameter(description = "Name of the `Organization`", example = "myorga") @RequestParam String organization, @Parameter(description = "Name of the `Space`", example = "myspace") @RequestParam String space, @Parameter(description = "id of the document", example = "d2a3cf15-cd6c-4a85-9752-da0628ce949e") @RequestParam String docid, @Parameter(description = "the new metadata") @RequestBody MeasurementDTO metadata) throws IOException, MetadataException {
+    public ResponseEntity<Boolean> indexPut(@Parameter(hidden = true) JwtAuthenticationToken token, @Parameter(description = "Name of the `Organization`",
+            example = "myorga") @RequestParam String organization,
+            @Parameter(description = "Name of the `Space`", example = "myspace") @RequestParam String space, @Parameter(description = "id of the document",
+            example = "d2a3cf15-cd6c-4a85-9752-da0628ce949e") @RequestParam String docid,
+            @Parameter(description = "the new metadata") @RequestBody MeasurementDTO metadata) throws IOException, MetadataException {
         if (token == null) {
             throw new ResponseStatusException(UNAUTHORIZED);
         }

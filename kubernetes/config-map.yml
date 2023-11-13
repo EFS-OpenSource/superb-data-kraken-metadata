@@ -65,8 +65,6 @@ data:
       organizationmanager-endpoints:
         organization: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/organization
         space: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/space
-      schemamanager-endpoints:
-        modelindex: http://schemamanager-service$(postfix).backend.svc.cluster.local:8090/schemamanager/v1.0/modelindex
     management:
       endpoints:
         web:
