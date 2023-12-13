@@ -10,17 +10,7 @@ metadata:
     appgw.ingress.kubernetes.io/appgw-ssl-certificate: cert-frontend-letsencrypt-cert
 spec:
   rules:
-  - host: efs-$(environment).westeurope.cloudapp.azure.com
-    http:
-      paths:
-      - path: /metadata/*
-        pathType: Prefix
-        backend:
-          service:
-            name: metadata-service
-            port:
-              number: 8090
-  - host: $(main-domain)
+  - host: $(DOMAIN)
     http:
       paths:
       - path: /metadata/*

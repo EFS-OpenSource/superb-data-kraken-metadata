@@ -21,64 +21,64 @@ spec:
     spec:
       serviceAccountName: metadata-account
       containers:
-        - name: metadata
-          image: acr$(environment).azurecr.io/metadata:$(tagVersion)
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: metadata-user
-              mountPath: "/etc/metadata-secret"
-              readOnly: true
-            - name: eventhub-secret
-              mountPath: "/etc/eventhub-secret"
-              readOnly: true
-            - name: meta-json-schema
-              mountPath: "/etc/meta-json-schema"
-              readOnly: true
-            - name: app-configuration
-              mountPath: "/etc/application"
-              readOnly: true
-          resources:
-            requests:
-              memory: 512Mi
-              cpu: 200m
-            limits:
-              memory: 768Mi
-              cpu: 300m
-          ports:
-            - containerPort: 8090
-              name: http
-          readinessProbe:
-            httpGet:
-              path: /metadata/actuator/health
-              port: 8090
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 1
-            successThreshold: 1
+      - name: metadata
+        image: $(CONTAINER_REGISTRY)/metadata:$(tagVersion)
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: metadata-user
+          mountPath: "/etc/metadata-secret"
+          readOnly: true
+        - name: eventhub-secret
+          mountPath: "/etc/eventhub-secret"
+          readOnly: true
+        - name: meta-json-schema
+          mountPath: "/etc/meta-json-schema"
+          readOnly: true
+        - name: app-configuration
+          mountPath: "/etc/application"
+          readOnly: true
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 200m
+          limits:
+            memory: 768Mi
+            cpu: 300m
+        ports:
+        - containerPort: 8090
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /metadata/actuator/health
+            port: 8090
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 2
+          failureThreshold: 1
+          successThreshold: 1
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 1
-              preference:
-                matchExpressions:
-                - key: agentpool
-                  operator: In
-                  values:
-                  - userpool
+          - weight: 1
+            preference:
+              matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - userpool
       volumes:
-        - name: metadata-user
-          secret:
-            secretName: metadata-user
-        - name: eventhub-secret
-          secret:
-            secretName: eventhub-secret
-        - name: meta-json-schema
-          secret:
-            secretName: meta-json-schema
-        - name: app-configuration
-          configMap:
-            name: metadata
+      - name: metadata-user
+        secret:
+          secretName: metadata-user
+      - name: eventhub-secret
+        secret:
+          secretName: eventhub-secret
+      - name: meta-json-schema
+        secret:
+          secretName: meta-json-schema
+      - name: app-configuration
+        configMap:
+          name: metadata
       restartPolicy: Always
   selector:
     matchLabels:

@@ -6,7 +6,7 @@ metadata:
 data:
   applicationinsights.json: |-
     {
-      "connectionString": "$(app-insights-con-string)",
+      "connectionString": "$(APP_INSIGHTS_CONNECTION_STRING)",
       "role": {
         "name": "Metadata Service"
       },
@@ -27,14 +27,14 @@ data:
       title: EFS SDK Metadata-API
     azure:
       application-insights:
-        instrumentation-key: $(app-insights-instrumentation-key)
+        instrumentation-key: $(APP_INSIGHTS_INSTRUMENTATION_KEY)
     sdk:
       oauth2:
-        client-id: $(environment)-client
+        client-id: $(CLIENT_ID)
         authorization-grant-type: authorization_code
         scope: openid
         user-name-attribute: preferred_username
-        config-url: http://keycloak$(postfix)-http.operations.svc.cluster.local/auth/realms/efs-$(environment)/.well-known/openid-configuration
+        config-url: http://keycloak$(postfix)-http.operations.svc.cluster.local/auth/realms/$(REALM)/.well-known/openid-configuration
     server:
       port: 8090
       servlet:
@@ -45,7 +45,7 @@ data:
       kafka:
         admin:
           fail-fast: true
-        bootstrap-servers: $(environment)-eventhub$(postfix).servicebus.windows.net:9093
+        bootstrap-servers: $(KAFKA_BOOTSTRAP_SERVER)
         properties:
           sasl:
             mechanism: PLAIN
@@ -58,10 +58,10 @@ data:
         indexing-done-topic: indexing-done
         metadata-update-topic: metadata-update
       opensearch:
-        url: https://$(elasticsearch-service).elasticsearch.svc.cluster.local:9200
-        security-endpoint: $(elasticsearch_security_endpoint)
+        url: https://$(ELASTICSEARCH_SERVICE).elasticsearch.svc.cluster.local:9200
+        security-endpoint: $(ELASTICSEARCH_SECURITY_ENDPOINT)
       auth:
-        client-id: $(environment)-client-confidential
+        client-id: $(CLIENT_ID_CONFIDENTIAL)
       organizationmanager-endpoints:
         organization: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/organization
         space: http://organizationmanager$(postfix).backend.svc.cluster.local:8090/organizationmanager/api/v1.0/space
@@ -80,5 +80,4 @@ data:
     logging:
       config: classpath:com/efs/sdk/logging/sdk.logback.xml
       level:
-        com.efs.sdk: $(logging-level)
-        org.springframework.web: INFO
+        com.efs.sdk: $(LOG_LEVEL)

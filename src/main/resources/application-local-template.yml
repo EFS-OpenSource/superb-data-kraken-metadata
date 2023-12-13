@@ -15,12 +15,12 @@ spring:
   kafka:
     admin:
       fail-fast: true
-    bootstrap-servers: sdk-eventhub-dev.servicebus.windows.net:9093
+    bootstrap-servers: $(KAFKA_BOOTSTRAP_SERVER)
     properties:
       sasl:
         mechanism: PLAIN
         jaas:
-          config: org.apache.kafka.common.security.plain.PlainLoginModule required username="$ConnectionString" password="Endpoint=sb://sdk-eventhub-dev.servicebus.windows.net/;SharedAccessKeyName=sdk-eventhub-dev-sendlisten;SharedAccessKey=<PASSWORD>";
+          config: $(KAFKA_SASL_JAAS_CONFIG)
       security:
         protocol: SASL_SSL
       group:
@@ -33,8 +33,8 @@ metadata:
     url: http://localhost:9200
     security-endpoint: /_plugins/_security/api
   auth:
-    client-id: $(CLIENT_ID)
-    client-secret: <CLIENT_SECRET>
+    client-id: $(CLIENT_ID_CONFIDENTIAL)
+    client-secret: $(CLIENT_SECRET_CONFIDENTIAL)
   organizationmanager-endpoints:
     organization: https://$(DOMAIN)/organizationmanager/api/v1.0/organization
     #    organization: http://localhost:<PORT>/organizationmanager/api/v1.0/organization
@@ -581,11 +581,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: [
-          prometheus,
-          health,
-          info
-        ]
+        include: [prometheus, health, info]
   health:
     opensearch:
       enabled: false
