@@ -17,6 +17,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: metadata-service
+            name: metadata-service$(postfix)
             port:
               number: 8090

@@ -94,7 +94,11 @@ public class MetadataController {
      * @return Boolean
      */
     @PutMapping(path = "/index")
-    @Operation(summary = "Update a document", description = "Endpoint for updating a metadata-document")
+    @Operation(summary = "Update a document", description = """
+            Endpoint for updating a metadata-document
+            
+            **CAUTION** Updating only supports appending properties! No existing data will be updated!
+            """)
     @ApiResponse(responseCode = "200", description = "Successfully indexed document")
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to update document")

@@ -8,13 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+
 - none
 
 ### Changed
+
 - update logging library
 - adjusted properties for installation-guide
+- append document with write-permissions
 
 ### Removed
+
 - none
 
 ---

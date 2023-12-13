@@ -15,7 +15,10 @@ limitations under the License.
  */
 package com.efs.sdk.metadata.core.metadata;
 
-import com.efs.sdk.metadata.clients.*;
+import com.efs.sdk.metadata.clients.MetadataOpensearchClient;
+import com.efs.sdk.metadata.clients.MetadataRestClient;
+import com.efs.sdk.metadata.clients.OpenSearchRestClientBuilder;
+import com.efs.sdk.metadata.clients.OrganizationManagerClient;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.events.EventPublisher;
 import com.efs.sdk.metadata.helper.EntityConverter;
@@ -36,7 +39,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.efs.sdk.metadata.clients.OrganizationManagerClient.Permissions.DELETE;
 import static com.efs.sdk.metadata.clients.OrganizationManagerClient.Permissions.WRITE;
 import static com.efs.sdk.metadata.commons.MetadataException.METADATA_ERROR.*;
 import static java.lang.String.format;
@@ -92,11 +94,6 @@ public class MetadataService {
         return spaceObj != null;
     }
 
-    private boolean canDelete(String accessToken, String organization, String space) throws MetadataException {
-        Map<String, Object> spaceObj = orgaClient.getSpace(accessToken, organization, space, DELETE);
-        return spaceObj != null;
-    }
-
     private void validate(MeasurementDTO measurement) throws MetadataException {
         // validate that required attributes are present
         if (measurement.getOrganization() == null) {
@@ -121,9 +118,24 @@ public class MetadataService {
         return eventPublisherModelDTO;
     }
 
+    /**
+     * Updating documents in OpenSearch.
+     * <br>
+     * <b>CAUTION</b> currently only appending
+     *
+     * @param input        The input-document
+     * @param accessToken  The access-token
+     * @param organization The organization
+     * @param space        The space
+     * @param documentId   The document-id
+     * @return whether update was successful
+     * @throws IOException       thrown on io-errors
+     * @throws MetadataException thrown on errors
+     */
     public boolean update(MeasurementDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException,
             IOException {
-        if (!canDelete(accessToken, organization, space)) {
+        // may be canDelete if "update" is defined as "real update" - but now only appending properties is supported!
+        if (!canWrite(accessToken, organization, space)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
         RestClient restClient = esBuilder.buildRestClient(accessToken);
