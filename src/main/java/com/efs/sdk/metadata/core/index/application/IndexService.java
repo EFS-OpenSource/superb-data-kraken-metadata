@@ -65,7 +65,8 @@ public class IndexService {
             throw new MetadataException(INDEX_NAME_INVALID, format("reason: custom index name %s invalid", indexCreateDTO.getCustomName()));
         }
 
-        String indexName = format("%s_%s_%s_%s", indexCreateDTO.getOrganizationName(), indexCreateDTO.getSpaceName(), indexCreateDTO.getIndexType().getIndexNamePrefix(), indexCreateDTO.getCustomName()).toLowerCase(Locale.getDefault());
+        String indexName = format("%s_%s_%s_%s", indexCreateDTO.getOrganizationName(), indexCreateDTO.getSpaceName(),
+                indexCreateDTO.getIndexType().getIndexNamePrefix(), indexCreateDTO.getCustomName()).toLowerCase(Locale.getDefault());
         if (!isValidIndexName(indexName)) {
             throw new MetadataException(INDEX_NAME_INVALID, format("(%s)", indexName));
         }
@@ -100,7 +101,9 @@ public class IndexService {
             client.performRequest(request);
             return true;
         } catch (ResponseException e) {
-            if (e.getResponse().getStatusLine().getStatusCode() == HttpStatus.NOT_FOUND.value()) return false;
+            if (e.getResponse().getStatusLine().getStatusCode() == HttpStatus.NOT_FOUND.value()) {
+                return false;
+            }
             throw e;
         }
     }
@@ -127,7 +130,8 @@ public class IndexService {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
         if (!isValidApplicationIndexPrefix(indexName)) {
-            throw new MetadataException(INDEX_NAME_INVALID, format("- does not contain application index prefix; pattern is '*_PREFIX_*' with possible values: %s", ApplicationIndexType.getIndexNamePrefixes()));
+            throw new MetadataException(INDEX_NAME_INVALID, format("- does not contain application index prefix; pattern is '*_PREFIX_*' with possible " +
+                    "values: %s", ApplicationIndexType.getIndexNamePrefixes()));
         }
         RestClient client = clientBuilder.buildRestClient(authService.getSAAccessToken());
         deleteApplicationIndex(indexName, client);
@@ -155,7 +159,9 @@ public class IndexService {
         try {
             client.performRequest(new Request(RequestMethod.DELETE.name(), endpoint));
         } catch (ResponseException e) {
-            if (e.getResponse().getStatusLine().getStatusCode() != HttpStatus.NOT_FOUND.value()) throw e;
+            if (e.getResponse().getStatusLine().getStatusCode() != HttpStatus.NOT_FOUND.value()) {
+                throw e;
+            }
         }
     }
 }

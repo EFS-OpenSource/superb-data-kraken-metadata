@@ -50,7 +50,8 @@ public class OrganizationmanagerService {
      * @param organizationEndpoint The organization endpoint
      * @param spaceEndpoint        The space endpoint
      */
-    public OrganizationmanagerService(RestTemplate restTemplate, @Value("${metadata.organizationmanager-endpoints.organization}") String organizationEndpoint, @Value("${metadata.organizationmanager-endpoints.space}") String spaceEndpoint) {
+    public OrganizationmanagerService(RestTemplate restTemplate, @Value("${metadata.organizationmanager-endpoints.organization}") String organizationEndpoint
+            , @Value("${metadata.organizationmanager-endpoints.space}") String spaceEndpoint) {
         this.restTemplate = restTemplate;
         this.organizationEndpoint = organizationEndpoint;
         this.spaceEndpoint = spaceEndpoint;
@@ -85,8 +86,11 @@ public class OrganizationmanagerService {
     public List<OrganizationContextDTO> getOrganizations(String accessToken) throws MetadataException {
         HttpEntity<String> request = getRequest(accessToken);
         try {
-            OrganizationContextDTO[] organizations = restTemplate.exchange(organizationEndpoint, HttpMethod.GET, request, OrganizationContextDTO[].class).getBody();
-            if (organizations == null) throw new MetadataException(UNABLE_GET_ORGANIZATIONS);
+            OrganizationContextDTO[] organizations =
+                    restTemplate.exchange(organizationEndpoint, HttpMethod.GET, request, OrganizationContextDTO[].class).getBody();
+            if (organizations == null) {
+                throw new MetadataException(UNABLE_GET_ORGANIZATIONS);
+            }
             return Arrays.asList(organizations);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -108,7 +112,9 @@ public class OrganizationmanagerService {
         try {
 
             SpaceContextDTO[] spaceContextDTOS = restTemplate.exchange(spacesGetEndpoint, HttpMethod.GET, request, SpaceContextDTO[].class).getBody();
-            if (spaceContextDTOS == null) throw new MetadataException(UNABLE_GET_SPACES);
+            if (spaceContextDTOS == null) {
+                throw new MetadataException(UNABLE_GET_SPACES);
+            }
 
             for (SpaceContextDTO space : spaceContextDTOS) space.setOrganization(organization);
             return Arrays.asList(spaceContextDTOS);

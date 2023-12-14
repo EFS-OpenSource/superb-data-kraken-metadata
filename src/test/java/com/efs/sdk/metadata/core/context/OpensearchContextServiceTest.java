@@ -99,7 +99,8 @@ class OpensearchContextServiceTest {
         this.opensearchHelper = Mockito.spy(new OpensearchHelper(this.objectMapper));
         this.organizationmanagerService = Mockito.mock(OrganizationmanagerService.class);
         String opensearch_security_endpoint = "/_plugins/_security/api";
-        this.opensearchContextServiceSpy = Mockito.spy(new OpensearchContextService(organizationmanagerService, clientBuilder, opensearchHelper, objectMapper, opensearch_security_endpoint));
+        this.opensearchContextServiceSpy = Mockito.spy(new OpensearchContextService(organizationmanagerService, clientBuilder, opensearchHelper, objectMapper
+                , opensearch_security_endpoint));
         OpensearchContextService opensearchContextServiceMock = Mockito.mock(OpensearchContextService.class);
         this.testOrganization = OrganizationContextDTO.builder().id(1L).name("test").description("description").build();
         this.testSpace = SpaceContextDTO.builder().name("test").organization(testOrganization).build();
@@ -193,7 +194,8 @@ class OpensearchContextServiceTest {
         String endpoint = format("%s/%s", ENDPOINT_TENANTS, testOrganization.getName());
         HttpRequest createTenantRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(endpoint);
         mockServer.when(createTenantRequest).respond(response().withStatusCode(CONFLICT.value()));
-        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.createTenant(testOrganization.getName(), testOrganization.getDescription() == null ? "" : testOrganization.getDescription(), TOKEN));
+        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.createTenant(testOrganization.getName(),
+                testOrganization.getDescription() == null ? "" : testOrganization.getDescription(), TOKEN));
     }
 
     @Test
@@ -208,7 +210,8 @@ class OpensearchContextServiceTest {
         String endpoint = format("%s/%s", ENDPOINT_TENANTS, testOrganization.getName());
         HttpRequest createTenantRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(endpoint);
         mockServer.when(createTenantRequest).respond(response().withStatusCode(OK.value()));
-        assertDoesNotThrow(() -> opensearchContextServiceSpy.createTenant(testOrganization.getName(), testOrganization.getDescription() == null ? "" : testOrganization.getDescription(), TOKEN));
+        assertDoesNotThrow(() -> opensearchContextServiceSpy.createTenant(testOrganization.getName(), testOrganization.getDescription() == null ? "" :
+                testOrganization.getDescription(), TOKEN));
     }
 
     @Test
@@ -224,7 +227,8 @@ class OpensearchContextServiceTest {
         String endpoint = format("%s/%s", ENDPOINT_TENANTS, testOrganization.getName());
         HttpRequest createTenantRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(endpoint);
         mockServer.when(createTenantRequest).respond(response().withStatusCode(OK.value()));
-        assertDoesNotThrow(() -> opensearchContextServiceSpy.createTenant(testOrganization.getName(), testOrganization.getDescription() == null ? "" : testOrganization.getDescription(), TOKEN));
+        assertDoesNotThrow(() -> opensearchContextServiceSpy.createTenant(testOrganization.getName(), testOrganization.getDescription() == null ? "" :
+                testOrganization.getDescription(), TOKEN));
     }
 
     @Test
@@ -296,7 +300,8 @@ class OpensearchContextServiceTest {
     @Test
     void givenOpensearchError_whenDeleteSpaceRoleMappings_thenError() {
         mockSpaceRolesmappingEndpoints(testSpace, HttpMethod.DELETE, INTERNAL_SERVER_ERROR);
-        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceRolesMappings(testSpace.getOrganization().getName(), testSpace.getName(), TOKEN));
+        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceRolesMappings(testSpace.getOrganization().getName(),
+                testSpace.getName(), TOKEN));
     }
 
     @Test
@@ -320,7 +325,8 @@ class OpensearchContextServiceTest {
     @Test
     void givenOpensearchError_whenDeleteSpaceRoles_thenError() {
         mockSpaceRoleEndpoints(testSpace, HttpMethod.DELETE, INTERNAL_SERVER_ERROR);
-        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceRoles(testSpace.getOrganization().getName(), testSpace.getName(), TOKEN));
+        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceRoles(testSpace.getOrganization().getName(), testSpace.getName(),
+                TOKEN));
     }
 
     @Test
@@ -341,7 +347,8 @@ class OpensearchContextServiceTest {
     void givenOpensearchError_whenDeleteSpaceAccessControlObjects_thenError() {
         mockSpaceRoleEndpoints(testSpace, HttpMethod.DELETE, INTERNAL_SERVER_ERROR);
         mockSpaceRolesmappingEndpoints(testSpace, HttpMethod.DELETE, INTERNAL_SERVER_ERROR);
-        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceContext(TOKEN, testSpace.getOrganization().getName(), testSpace.getName()));
+        assertThrows(MetadataException.class, () -> opensearchContextServiceSpy.deleteSpaceContext(TOKEN, testSpace.getOrganization().getName(),
+                testSpace.getName()));
     }
 
     @Test

@@ -18,7 +18,6 @@ package com.efs.sdk.metadata.core.metadata;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.SchemaService;
 import com.efs.sdk.metadata.model.MeasurementDTO;
-import com.efs.sdk.metadata.model.MetadataDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -95,12 +94,20 @@ public class MetadataController {
      * @return Boolean
      */
     @PutMapping(path = "/index")
-    @Operation(summary = "Update a document", description = "Endpoint for updating a metadata-document")
+    @Operation(summary = "Update a document", description = """
+            Endpoint for updating a metadata-document
+            
+            **CAUTION** Updating only supports appending properties! No existing data will be updated!
+            """)
     @ApiResponse(responseCode = "200", description = "Successfully indexed document")
     @ApiResponse(responseCode = "401", description = "User is not authorized")
     @ApiResponse(responseCode = "403", description = "User does not have permissions to update document")
     @ApiResponse(responseCode = "507", description = "Unable to retrieve the indexed document")
-    public ResponseEntity<Boolean> indexPut(@Parameter(hidden = true) JwtAuthenticationToken token, @Parameter(description = "Name of the `Organization`", example = "myorga") @RequestParam String organization, @Parameter(description = "Name of the `Space`", example = "myspace") @RequestParam String space, @Parameter(description = "id of the document", example = "d2a3cf15-cd6c-4a85-9752-da0628ce949e") @RequestParam String docid, @Parameter(description = "the new metadata") @RequestBody MetadataDTO metadata) throws IOException, MetadataException {
+    public ResponseEntity<Boolean> indexPut(@Parameter(hidden = true) JwtAuthenticationToken token, @Parameter(description = "Name of the `Organization`",
+            example = "myorga") @RequestParam String organization,
+            @Parameter(description = "Name of the `Space`", example = "myspace") @RequestParam String space, @Parameter(description = "id of the document",
+            example = "d2a3cf15-cd6c-4a85-9752-da0628ce949e") @RequestParam String docid,
+            @Parameter(description = "the new metadata") @RequestBody MeasurementDTO metadata) throws IOException, MetadataException {
         if (token == null) {
             throw new ResponseStatusException(UNAUTHORIZED);
         }

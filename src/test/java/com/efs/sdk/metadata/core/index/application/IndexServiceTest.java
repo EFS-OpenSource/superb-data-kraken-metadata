@@ -39,8 +39,6 @@ import java.io.IOException;
 import static com.efs.sdk.metadata.utils.TestHelper.findRandomPort;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.mockserver.model.HttpResponse.response;
 import static org.springframework.http.HttpStatus.*;
@@ -82,7 +80,8 @@ class IndexServiceTest {
         mockServer.when(aliasRequest).respond(response().withStatusCode(NOT_FOUND.value()));
         aliasRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(format("/%s", correctIndexName));
         mockServer.when(aliasRequest).respond(response().withStatusCode(OK.value()));
-        aliasRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(format("/%s/_alias/%s", correctIndexName, testDTO.getIndexType().getIndexAlias()));
+        aliasRequest = HttpRequest.request().withMethod(HttpMethod.PUT.name()).withPath(format("/%s/_alias/%s", correctIndexName,
+                testDTO.getIndexType().getIndexAlias()));
         mockServer.when(aliasRequest).respond(response().withStatusCode(OK.value()));
         doReturn(true).when(service).canCreateApplicationIndex(token, testDTO);
 
@@ -130,7 +129,6 @@ class IndexServiceTest {
     @Test
     void givenInvalidIndexName_whenDeleteIndex_thenThrowException() {
         String incorrectIndexName = "one_two_three_four_five";
-
 
         MetadataException metadataException = assertThrows(MetadataException.class, () -> service.deleteApplicationIndex(incorrectIndexName, token));
         assertEquals(BAD_REQUEST.value(), metadataException.getHttpStatus().value());

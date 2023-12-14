@@ -15,7 +15,10 @@ limitations under the License.
  */
 package com.efs.sdk.metadata.core.metadata;
 
-import com.efs.sdk.metadata.clients.*;
+import com.efs.sdk.metadata.clients.MetadataOpensearchClient;
+import com.efs.sdk.metadata.clients.MetadataRestClient;
+import com.efs.sdk.metadata.clients.OpenSearchRestClientBuilder;
+import com.efs.sdk.metadata.clients.OrganizationManagerClient;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.events.EventPublisher;
 import com.efs.sdk.metadata.helper.EntityConverter;
@@ -28,6 +31,7 @@ import com.github.wnameless.json.unflattener.JsonUnflattener;
 import org.opensearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,7 +39,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.efs.sdk.metadata.clients.OrganizationManagerClient.Permissions.DELETE;
 import static com.efs.sdk.metadata.clients.OrganizationManagerClient.Permissions.WRITE;
 import static com.efs.sdk.metadata.commons.MetadataException.METADATA_ERROR.*;
 import static java.lang.String.format;
@@ -45,22 +48,31 @@ public class MetadataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetadataService.class);
 
+
+    /**
+     * Name of the Kafka-Topic
+     */
+    @Value("${metadata.topics.indexing-done-topic}")
+    private String indexingDoneTopic;
+
+    @Value("${metadata.topics.metadata-update-topic}")
+    private String metadataUpdateTopic;
+
     private final EventPublisher publisher;
     private final EntityConverter converter;
     private final OpenSearchRestClientBuilder esBuilder;
     private final MetadataRestClient client;
     private final MetadataOpensearchClient mOSClient;
     private final OrganizationManagerClient orgaClient;
-    private final SchemaManagerClient schemaClient;
 
-    public MetadataService(EventPublisher publisher, EntityConverter converter, OpenSearchRestClientBuilder esBuilder, MetadataRestClient client, MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient, SchemaManagerClient schemaClient) {
+    public MetadataService(EventPublisher publisher, EntityConverter converter, OpenSearchRestClientBuilder esBuilder, MetadataRestClient client,
+            MetadataOpensearchClient mOSClient, OrganizationManagerClient orgaClient) {
         this.publisher = publisher;
         this.converter = converter;
         this.esBuilder = esBuilder;
         this.client = client;
         this.mOSClient = mOSClient;
         this.orgaClient = orgaClient;
-        this.schemaClient = schemaClient;
     }
 
     public boolean index(String accessToken, MeasurementDTO measurement) throws MetadataException {
@@ -79,11 +91,6 @@ public class MetadataService {
 
     private boolean canWrite(String accessToken, String organization, String space) throws MetadataException {
         Map<String, Object> spaceObj = orgaClient.getSpace(accessToken, organization, space, WRITE);
-        return spaceObj != null;
-    }
-
-    private boolean canDelete(String accessToken, String organization, String space) throws MetadataException {
-        Map<String, Object> spaceObj = orgaClient.getSpace(accessToken, organization, space, DELETE);
         return spaceObj != null;
     }
 
@@ -107,11 +114,28 @@ public class MetadataService {
         eventPublisherModelDTO.setAccountName(measurement.getOrganization());
         eventPublisherModelDTO.setContainerName(measurement.getSpace());
         eventPublisherModelDTO.setRootDir(measurement.getRootdir());
+        eventPublisherModelDTO.setUuid(measurement.getDocid());
         return eventPublisherModelDTO;
     }
 
-    public boolean update(MetadataDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException, IOException {
-        if (!canDelete(accessToken, organization, space)) {
+    /**
+     * Updating documents in OpenSearch.
+     * <br>
+     * <b>CAUTION</b> currently only appending
+     *
+     * @param input        The input-document
+     * @param accessToken  The access-token
+     * @param organization The organization
+     * @param space        The space
+     * @param documentId   The document-id
+     * @return whether update was successful
+     * @throws IOException       thrown on io-errors
+     * @throws MetadataException thrown on errors
+     */
+    public boolean update(MeasurementDTO input, String accessToken, String organization, String space, String documentId) throws MetadataException,
+            IOException {
+        // may be canDelete if "update" is defined as "real update" - but now only appending properties is supported!
+        if (!canWrite(accessToken, organization, space)) {
             throw new MetadataException(INSUFFICIENT_RIGHTS);
         }
         RestClient restClient = esBuilder.buildRestClient(accessToken);
@@ -123,30 +147,38 @@ public class MetadataService {
         if (source.getMetadata() == null) {
             source.setMetadata(Collections.emptyMap());
         }
-        if (source.getMassdataFiles() == null) {
-            source.setMassdataFiles(Collections.emptyList());
+        if (source.getMassdata() == null) {
+            source.setMassdata(Collections.emptyList());
         }
 
         Map<String, Object> inputMetadataFlatten = JsonFlattener.flattenAsMap(converter.metadataValue(input.getMetadata()));
         Map<String, Object> sourceMetadataFlatten = JsonFlattener.flattenAsMap(converter.metadataValue(source.getMetadata()));
 
-        Map<String, Object> mergedFlatten = Stream.of(sourceMetadataFlatten, inputMetadataFlatten).flatMap(map -> map.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+        Map<String, Object> mergedFlatten =
+                Stream.of(sourceMetadataFlatten, inputMetadataFlatten).flatMap(map -> map.entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue, (v1, v2) -> v1));
 
         Map<String, Object> mergedMetadata = converter.metadataValue(JsonUnflattener.unflatten(converter.metadataValue(mergedFlatten)));
 
         Set<MassdataFile> massdataFiles = new HashSet<>();
-        massdataFiles.addAll(source.getMassdataFiles());
-        massdataFiles.addAll(input.getMassdataFiles());
+        massdataFiles.addAll(source.getMassdata());
+        massdataFiles.addAll(input.getMassdata());
 
         MetadataDTO result = new MetadataDTO();
         result.setUuid(source.getUuid());
         result.setSpace(source.getSpace());
         result.setOrganization(source.getOrganization());
         result.setMetadata(mergedMetadata);
-        result.setMassdataFiles(List.copyOf(massdataFiles));
+        result.setMassdata(List.copyOf(massdataFiles));
 
+        EventPublisherModelDTO eventPublisherModelDTO = getEventPublisherModelDTO(input);
+
+        LOG.debug("updating");
         int updated = mOSClient.updateMetadata(restClient, index, documentId, converter.metadataValue(result));
-
+        LOG.debug("updating done");
+        LOG.debug("publishing event");
+        publisher.sendMessage(metadataUpdateTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
+        LOG.debug("publishing event done");
         return updated > 0;
     }
 
@@ -163,12 +195,11 @@ public class MetadataService {
         LOG.debug("indexing");
 
         int indexed = mOSClient.createMetadata(restClient, index, metadataValue, indexDTO.getDocid());
-        int modelIndexed = schemaClient.indexModel(accessToken, index);
         LOG.debug("indexing done");
         LOG.debug("publishing event");
-        publisher.sendMessage(converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
+        publisher.sendMessage(indexingDoneTopic, converter.eventPublisherModelAsMessage(eventPublisherModelDTO));
         LOG.debug("publishing event done");
-        return indexed > 0 && modelIndexed > 0;
+        return indexed > 0;
     }
 
     private MetadataDTO getMetadataDTO(MeasurementDTO measurement) {
@@ -177,7 +208,7 @@ public class MetadataService {
         metadata.setMetadata(measurement.getMetadata());
         metadata.setSpace(measurement.getSpace());
         metadata.setOrganization(measurement.getOrganization());
-        metadata.setMassdataFiles(measurement.getMassdataFiles());
+        metadata.setMassdata(measurement.getMassdata());
         return metadata;
     }
 

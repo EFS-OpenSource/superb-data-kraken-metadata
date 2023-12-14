@@ -47,7 +47,8 @@ public class OrganizationManagerClient {
         READ, WRITE, DELETE, GET
     }
 
-    public OrganizationManagerClient(RestTemplate restTemplate, @Value("${metadata.organizationmanager-endpoints.organization}") String organizationEndpoint, @Value("${metadata.organizationmanager-endpoints.space}") String spaceEndpoint) {
+    public OrganizationManagerClient(RestTemplate restTemplate, @Value("${metadata.organizationmanager-endpoints.organization}") String organizationEndpoint,
+            @Value("${metadata.organizationmanager-endpoints.space}") String spaceEndpoint) {
         this.restTemplate = restTemplate;
         this.organizationEndpoint = organizationEndpoint;
         this.spaceEndpoint = spaceEndpoint;

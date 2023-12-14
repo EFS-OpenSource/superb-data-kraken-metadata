@@ -67,7 +67,6 @@ class OrganizationManagerClientTest {
         };
         given(restTemplate.exchange(eq(spacesUrl), eq(HttpMethod.GET), any(HttpEntity.class), eq(spacesResponseType))).willReturn(ResponseEntity.ok(spaces));
 
-
         assertNotNull(client.getSpace("my-token", orgaName, spaceName, OrganizationManagerClient.Permissions.GET));
     }
 

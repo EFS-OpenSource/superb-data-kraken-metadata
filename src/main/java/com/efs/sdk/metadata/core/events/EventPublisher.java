@@ -17,7 +17,6 @@ package com.efs.sdk.metadata.core.events;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -43,12 +42,6 @@ public class EventPublisher {
      */
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    /**
-     * Name of the Kafka-Topic
-     */
-    @Value("${metadata.topics.indexing-done-topic}")
-    private String topicName;
-
     private final TaskExecutor taskExecutor;
 
     /**
@@ -65,9 +58,11 @@ public class EventPublisher {
     /**
      * Sends the message
      *
-     * @param message The message
+     * @param topicName The name of the topic
+     * @param message   The message
      */
-    public void sendMessage(String message) {
+    public void sendMessage(String topicName, String message) {
+        LOG.debug("sending event '{}' to topic '{}'", message, topicName);
         this.taskExecutor.execute(new EventTask(kafkaTemplate, topicName, message));
     }
 

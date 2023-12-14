@@ -1,4 +1,4 @@
-# Metadata-Service
+ # Metadata-Service
 
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -11,14 +11,15 @@
   <em>A data platform for everyone</em>
 </p>
 
-- [About](#about)
-- [Getting Started](#getting-started)
+- [Metadata-Service](#metadata-service)
+  - [About](#about)
+  - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Setup](#setup)
     - [Configuration](#configuration)
     - [Usage](#usage)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
+  - [Contributing](#contributing)
+  - [Changelog](#changelog)
 
 ---
 
@@ -31,10 +32,10 @@ It offers a REST API for OpenSearch resources management, including indices, rol
 and access controls for data security.
 
 For a more detailed understanding of the broader context of the platform this project is used in, refer to
-the [architecture documentation](https://github.com/EFS-OpenSource/superb-data-kraken-architecture). (TODO)
+the [architecture documentation](https://efs-opensource.github.io/superbdatakraken/architecture/).
 
 For instructions on how to deploy the Metadata-Service on an instance of the **SDK**, refer to
-the [installation instructions](https://github.com/EFS-OpenSource/superb-data-kraken-install-instructions). (TODO)
+the [installation instructions](https://efs-opensource.github.io/superbdatakraken/operator-manual/installation/).
 
 Refer to [index.md](docs%2Findex.md) for more detailed but deployment specific documentation.
 
@@ -84,7 +85,6 @@ To set up your local environment for development and testing, follow these steps
 - Replace all placeholders enclosed in `$()`, e.g.:
     - `REALM`: the specific realm set up with the openid connect (oidc) provider.
     - `CLIENT_ID`: the unique identifier for the service account that the service utilizes.
-    - `CLIENT_SECRET`: the confidential passphrase or key associated with the service account.
 
 ### Usage
 

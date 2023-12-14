@@ -24,22 +24,21 @@ public enum RoleScopeSpace {
      * Role for reading-purpose with backend-roles &quot;user&quot; and &quot;supplier&quot; and default-action-group
      * &quot;read&quot;
      */
-    READ(new String[]{"user", "supplier"}, new String[]{"read", "indices:data/read/scroll", "indices:admin/mappings/get"}, "read", "kibana_all_read"),
+    READ(new String[]{"user", "supplier"}, new String[]{"read", "indices:data/read/scroll", "indices:admin/mappings/get"}, "kibana_all_read"),
     /**
      * Role for crud-purpose (read, create, update and delete) with backend-role &quot;trustee&quot; and
      * default-action-group &quot;crud&quot;
      */
-    CRUD(new String[]{"trustee"}, new String[]{"crud", "indices:data/read/scroll", "indices:admin/mappings/get", "indices:admin/mappings/put"}, "crud", "kibana_all_write");
+    CRUD(new String[]{"trustee"}, new String[]{"crud", "indices:data/read/scroll", "indices:admin/mappings/get", "indices:admin/mappings/put"},
+            "kibana_all_write");
 
     private final String[] roles;
     private final String[] indexPermissions;
-    private final String modelindexPermission;
     private final String tenantPermission;
 
-    RoleScopeSpace(String[] roles, String[] indexPermissions, String modelindexPermission, String tenantPermission) {
+    RoleScopeSpace(String[] roles, String[] indexPermissions, String tenantPermission) {
         this.roles = roles;
         this.indexPermissions = indexPermissions;
-        this.modelindexPermission = modelindexPermission;
         this.tenantPermission = tenantPermission;
     }
 
@@ -51,9 +50,6 @@ public enum RoleScopeSpace {
         return indexPermissions;
     }
 
-    public String getModelindexPermission() {
-        return this.modelindexPermission;
-    }
 
     public String getTenantPermission() {
         return tenantPermission;

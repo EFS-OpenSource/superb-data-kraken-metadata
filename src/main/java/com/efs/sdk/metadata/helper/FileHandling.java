@@ -46,7 +46,9 @@ public class FileHandling {
      */
     public static InputStream getResourceFileAsInputStream(String fileName) throws IOException {
         InputStream inputStream = FileHandling.class.getResourceAsStream("/" + fileName);
-        if (inputStream == null) throw new IOException(String.format("input stream of %s is null", fileName));
+        if (inputStream == null) {
+            throw new IOException(String.format("input stream of %s is null", fileName));
+        }
         return inputStream;
     }
 

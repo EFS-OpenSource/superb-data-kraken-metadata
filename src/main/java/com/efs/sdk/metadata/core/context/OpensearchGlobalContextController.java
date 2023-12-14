@@ -50,7 +50,8 @@ public class OpensearchGlobalContextController {
         this.authService = authService;
     }
 
-    @Operation(summary = "Synchronize OpenSearch-context", description = "Recover all corresponding OpenSearch tenants, roles and rolesmappings by deleting them and recreate (indices are only being created)")
+    @Operation(summary = "Synchronize OpenSearch-context", description = "Recover all corresponding OpenSearch tenants, roles and rolesmappings by deleting " +
+            "them and recreate (indices are only being created)")
     @PutMapping(value = "/sync_opensearch")
     @ApiResponse(responseCode = "204", description = "Successfully synced OpenSearch")
     @ApiResponse(responseCode = "400", description = "Unable to retrieve one of the following: all `Organizations`, all `Spaces`")

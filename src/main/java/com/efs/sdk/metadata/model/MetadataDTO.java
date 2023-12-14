@@ -34,7 +34,7 @@ public class MetadataDTO extends HashMap<String, Object> {
         result.setOrganization((String) document.getOrDefault(PROP_ORGANIZATION, DEFAULT_NONE));
         result.setSpace((String) document.getOrDefault(PROP_SPACE, DEFAULT_NONE));
         result.setMetadata((Map<String, Object>) document.getOrDefault(PROP_METADATA, Map.of()));
-        result.setMassdataFiles((List<MassdataFile>) document.getOrDefault(PROP_MASSDATA, List.of()));
+        result.setMassdata((List<MassdataFile>) document.getOrDefault(PROP_MASSDATA, List.of()));
 
         return result;
     }
@@ -63,11 +63,11 @@ public class MetadataDTO extends HashMap<String, Object> {
         this.put(PROP_SPACE, space);
     }
 
-    public List<MassdataFile> getMassdataFiles() {
+    public List<MassdataFile> getMassdata() {
         return (List<MassdataFile>) this.getOrDefault(PROP_MASSDATA, Collections.emptyList());
     }
 
-    public void setMassdataFiles(List<MassdataFile> massdata) {
+    public void setMassdata(List<MassdataFile> massdata) {
         this.put(PROP_MASSDATA, massdata);
     }
 
@@ -86,8 +86,12 @@ public class MetadataDTO extends HashMap<String, Object> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MetadataDTO that = (MetadataDTO) o;
         return Objects.equals(getUuid(), that.getUuid());
     }

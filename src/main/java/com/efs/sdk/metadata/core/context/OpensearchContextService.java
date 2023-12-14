@@ -25,6 +25,7 @@ import com.efs.sdk.metadata.clients.OpenSearchRestClientBuilder;
 import com.efs.sdk.metadata.commons.MetadataException;
 import com.efs.sdk.metadata.core.OrganizationmanagerService;
 import com.efs.sdk.metadata.helper.OpensearchHelper;
+import com.efs.sdk.metadata.helper.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -77,7 +78,9 @@ public class OpensearchContextService {
      *
      * @param organizationmanagerService The organizationmanager service
      */
-    public OpensearchContextService(OrganizationmanagerService organizationmanagerService, OpenSearchRestClientBuilder clientBuilder, OpensearchHelper opensearchHelper, ObjectMapper objectMapper, @Value("${metadata.opensearch.security-endpoint}") String opensearchSecurityEndpoint) {
+    public OpensearchContextService(OrganizationmanagerService organizationmanagerService, OpenSearchRestClientBuilder clientBuilder,
+            OpensearchHelper opensearchHelper, ObjectMapper objectMapper,
+            @Value("${metadata.opensearch.security-endpoint}") String opensearchSecurityEndpoint) {
         this.clientBuilder = clientBuilder;
         this.objectMapper = objectMapper;
         this.endpointRoles = opensearchSecurityEndpoint + "/roles";
@@ -178,11 +181,13 @@ public class OpensearchContextService {
         String organizationName = organization.getName();
 
         if (Confidentiality.PUBLIC.equals(organization.getConfidentiality())) {
-            createRole(restClient, opensearchHelper.getTenantRoleRequest(KIBANA_ALL_READ, organizationName), opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC));
+            createRole(restClient, opensearchHelper.getTenantRoleRequest(KIBANA_ALL_READ, organizationName),
+                    opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC));
         } else {
             for (RoleScopeOrganization scope : RoleScopeOrganization.values()) {
                 for (String role : scope.getRoles()) {
-                    createRole(restClient, opensearchHelper.getTenantRoleRequest(scope.getPermission(), organizationName), opensearchHelper.getOrganizationRoleName(organizationName, role));
+                    createRole(restClient, opensearchHelper.getTenantRoleRequest(scope.getPermission(), organizationName),
+                            opensearchHelper.getOrganizationRoleName(organizationName, role));
                 }
             }
         }
@@ -201,11 +206,13 @@ public class OpensearchContextService {
         String organizationName = organization.getName();
 
         if (Confidentiality.PUBLIC.equals(organization.getConfidentiality())) {
-            createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC), opensearchHelper.getRolesMappingJson(Collections.singletonList(ORG_ALL_PUBLIC)));
+            createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, PUBLIC),
+                    opensearchHelper.getRolesMappingJson(Collections.singletonList(ORG_ALL_PUBLIC)));
         } else {
             for (RoleScopeOrganization scope : RoleScopeOrganization.values()) {
                 for (String role : scope.getRoles()) {
-                    createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, role), opensearchHelper.getRolesMappingJson(Collections.singletonList(format("org_%s_%s", organizationName, role))));
+                    createRolesMapping(restClient, opensearchHelper.getOrganizationRoleName(organizationName, role),
+                            opensearchHelper.getRolesMappingJson(Collections.singletonList(format("org_%s_%s", organizationName, role))));
                 }
             }
         }
@@ -505,14 +512,16 @@ public class OpensearchContextService {
         List<OrganizationContextDTO> organizations = organizationmanagerService.getOrganizations(token);
 
         for (OrganizationContextDTO organization : organizations) {
-            AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", token, organization.getName());
+            AuditLogger.info(LOG, "Updating OpenSearch context for organization {}", Utils.getSubjectAsToken(),
+                    organization.getName());
             updateOrganizationContext(organization, token);
             createTenant(organization, token);
 
             List<SpaceContextDTO> spaceContextDTOList = organizationmanagerService.getSpaces(token, organization);
 
             for (SpaceContextDTO space : spaceContextDTOList) {
-                AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}", token, space.getName(), organization.getName());
+                AuditLogger.info(LOG, "Updating OpenSearch context for space {} in organization {}",
+                        Utils.getSubjectAsToken(), space.getName(), organization.getName());
                 updateSpaceContext(space, token);
             }
         }

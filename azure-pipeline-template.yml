@@ -1,15 +1,15 @@
 # Template parameters
 parameters:
-- name: stage
-  type: string
-  values:
-  - 'dev'
-  - 'prod'
-  default: 'dev'
+  - name: stage
+    type: string
+    values:
+      - 'dev'
+      - 'prod'
+    default: 'dev'
 
 variables:
   imageRepository: 'metadata'
-  containerRegistry: 'acr$(environment).azurecr.io'
+  containerRegistry: '$(CONTAINER_REGISTRY)'
   dockerfilePath: 'Dockerfile'
   ${{ if eq(parameters.stage, 'prod') }}:
     tagVersion: '$(Build.BuildId)'
@@ -105,19 +105,19 @@ stages:
           - upload: kubernetes
             artifact: kubernetes
 
-# Deploy stage:
-# 1. Runs a KubernetesManifest task that creates a kubernetes secret that hold the credentials to connect to ACR
-# 2. Runs a replacetokens task that replaces tokens in the kubernetes/*.yml files with pipeline environment variables
-# 3. Runs a KubernetesManifest task that
-#       1. deploys all the manifests in the kubernetes folder (= runs a "kubectl apply" for every one of them)
-#       2. retrieves the previously built docker image from ACR and deploys it
+  # Deploy stage:
+  # 1. Runs a KubernetesManifest task that creates a kubernetes secret that hold the credentials to connect to ACR
+  # 2. Runs a replacetokens task that replaces tokens in the kubernetes/*.yml files with pipeline environment variables
+  # 3. Runs a KubernetesManifest task that
+  #       1. deploys all the manifests in the kubernetes folder (= runs a "kubectl apply" for every one of them)
+  #       2. retrieves the previously built docker image from ACR and deploys it
   - stage: Deploy
     displayName: Deploy stage
     dependsOn: Build
 
     jobs:
       - deployment: Deploy
-        timeoutInMinutes: 2
+        timeoutInMinutes: 4
         condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/pull/')))
         displayName: Deploy
         environment: 'dev'
@@ -151,20 +151,12 @@ stages:
                     action: 'deploy'
                     kubernetesServiceConnection: '$(kubernetesServiceConnection)'
                     namespace: 'backend'
-                    ${{ if eq(parameters.stage, 'prod') }}:
-                      manifests: |
-                        $(Pipeline.Workspace)/kubernetes/rbac.yml
-                        $(Pipeline.Workspace)/kubernetes/config-map.yml
-                        $(Pipeline.Workspace)/kubernetes/secret.yml
-                        $(Pipeline.Workspace)/kubernetes/deployment.yml
-                        $(Pipeline.Workspace)/kubernetes/service.yml
-                        $(Pipeline.Workspace)/kubernetes/ingress.yml
-                    ${{ if eq(parameters.stage, 'dev') }}:
-                      manifests: |
-                        $(Pipeline.Workspace)/kubernetes/rbac.yml
-                        $(Pipeline.Workspace)/kubernetes/config-map.yml
-                        $(Pipeline.Workspace)/kubernetes/secret.yml
-                        $(Pipeline.Workspace)/kubernetes/deployment.yml
-                        $(Pipeline.Workspace)/kubernetes/service.yml
-                        $(Pipeline.Workspace)/kubernetes/ingress-dev.yml
+                    manifests: |
+                      $(Pipeline.Workspace)/kubernetes/rbac.yml
+                      $(Pipeline.Workspace)/kubernetes/config-map.yml
+                      $(Pipeline.Workspace)/kubernetes/secret.yml
+                      $(Pipeline.Workspace)/kubernetes/meta-json-schema.yml
+                      $(Pipeline.Workspace)/kubernetes/deployment.yml
+                      $(Pipeline.Workspace)/kubernetes/service.yml
+                      $(Pipeline.Workspace)/kubernetes/ingress.yml
                     containers: '$(containerRegistry)/$(imageRepository):$(tagVersion)'

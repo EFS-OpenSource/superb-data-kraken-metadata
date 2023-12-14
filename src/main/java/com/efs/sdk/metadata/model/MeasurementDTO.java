@@ -15,6 +15,7 @@ limitations under the License.
  */
 package com.efs.sdk.metadata.model;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.*;
@@ -22,6 +23,7 @@ import java.util.*;
 public class MeasurementDTO extends HashMap<String, Object> {
 
     @Schema(description = "The id of the document")
+    @JsonAlias({"accountName", "organization"})
     private static final String PROP_DOCID = "docid";
     @Schema(description = "The massdata-block")
     private static final String PROP_MASSDATA = "massdata";
@@ -66,14 +68,14 @@ public class MeasurementDTO extends HashMap<String, Object> {
         this.put(PROP_ROOTDIR, rootdir);
     }
 
-    public List<MassdataFile> getMassdataFiles() {
+    public List<MassdataFile> getMassdata() {
         if (containsKey(PROP_MASSDATA)) {
             return (List<MassdataFile>) this.get(PROP_MASSDATA);
         }
         return Collections.emptyList();
     }
 
-    public void setMassdataFiles(List<MassdataFile> massdata) {
+    public void setMassdata(List<MassdataFile> massdata) {
         this.put(PROP_MASSDATA, massdata);
     }
 
@@ -92,8 +94,12 @@ public class MeasurementDTO extends HashMap<String, Object> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MeasurementDTO that = (MeasurementDTO) o;
         return Objects.equals(getDocid(), that.getDocid());
     }
